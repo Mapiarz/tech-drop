@@ -47,10 +47,8 @@ public class GameTile : MonoBehaviour
         if ( isMoving )
             return;
         //TODO: Consider PositionChanged in property setter
-        var dimension = gameBoard.Dimensions.y;
         var delta = destination - boardPosition;
         var size = GetComponent<SpriteRenderer>().bounds.size;
-        startPos = transform.localPosition;
         desiredPosition = transform.localPosition + ( new Vector3( delta.x, delta.y * -1 ) * size.y );
         BoardPosition = destination;
         isMoving = true;
@@ -67,28 +65,13 @@ public class GameTile : MonoBehaviour
         Teleport( new Vector2( 0, 0 ) );
     }
 
-
-    Vector3 startPos = Vector3.zero;
-
     void Update()
     {
         if ( isMoving )
         {
-            //var distanceToCover = desiredPosition - startPos;
-            //var distanceCovered = desiredPosition - transform.localPosition;
-            //var completion = distanceCovered.y / distanceToCover.y;
-            //Debug.Log( completion );
-            var deltaTime = Time.deltaTime;
-            var delta = desiredPosition - transform.localPosition;
-            if ( delta.magnitude <= 0.01 * gameBoard.BlockSpeed )
-            {
-                transform.localPosition = desiredPosition;
+            transform.localPosition = Vector3.MoveTowards( transform.localPosition, desiredPosition, Time.deltaTime * gameBoard.BlockSpeed );
+            if ( desiredPosition == transform.localPosition )
                 isMoving = false;
-            }
-            else
-                //transform.localEulerAngles = Vector3.MoveTowards( transform.localPosition, desiredPosition, deltaTime * gameBoard.BlockSpeed );
-                //transform.localPosition = Vector3.MoveTowards( transform.localPosition, desiredPosition, deltaTime * gameBoard.BlockSpeed * gameBoard.MoveCurve.Evaluate( completion ) );
-                transform.Translate( new Vector3( delta.x, delta.y ).normalized * gameBoard.BlockSpeed * deltaTime );
         }
     }
 
