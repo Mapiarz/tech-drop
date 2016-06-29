@@ -40,6 +40,8 @@ public class GameTile : MonoBehaviour
     }
 
 
+    //TODO: Expose property getter
+    //TODO: Expose events finishedMoving
     bool isMoving = false;
 
     public void Move( Vector2 destination )
