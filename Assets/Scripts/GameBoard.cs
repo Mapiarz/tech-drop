@@ -1,10 +1,18 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.Assertions;
 
 public class GameBoard : MonoBehaviour
 {
     public Vector2 Dimensions;
     public Vector3 Anchor;
+    public float BlockSpeed = 1f;
+    public AnimationCurve MoveCurve;
+
+    void Awake()
+    {
+        Assert.IsNotNull( MoveCurve );
+    }
 
     // Use this for initialization
     void Start()

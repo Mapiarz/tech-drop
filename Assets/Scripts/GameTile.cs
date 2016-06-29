@@ -8,6 +8,7 @@ public class GameTile : MonoBehaviour
     TileColor color;
     [SerializeField]
     Vector2 boardPosition;
+    Vector3 desiredPosition;
 
     GameBoard gameBoard;
 
@@ -39,43 +40,63 @@ public class GameTile : MonoBehaviour
     }
 
 
-
+    bool isMoving = false;
 
     public void Move( Vector2 destination )
     {
+        if ( isMoving )
+            return;
         //TODO: Consider PositionChanged in property setter
-        //throw new NotImplementedException();
         var dimension = gameBoard.Dimensions.y;
-        var delta = BoardPosition - destination;
+        var delta = destination - boardPosition;
         var size = GetComponent<SpriteRenderer>().bounds.size;
-
-        transform.Translate( new Vector3( delta.x * -1, delta.y ) * size.y );
+        startPos = transform.localPosition;
+        desiredPosition = transform.localPosition + ( new Vector3( delta.x, delta.y * -1 ) * size.y );
         BoardPosition = destination;
+        isMoving = true;
+    }
+
+    private void Teleport( Vector2 destination )
+    {
+        transform.localPosition = Vector3.Scale( gameBoard.Anchor, ( new Vector3( destination.x, destination.y ) + Vector3.one ) );
     }
 
     void Awake()
     {
         gameBoard = transform.parent.GetComponent<GameBoard>();
-        Move( new Vector2( 0, 0 ) );
+        Teleport( new Vector2( 0, 0 ) );
     }
 
-    // Use this for initialization
-    void Start()
-    {
 
-    }
+    Vector3 startPos = Vector3.zero;
 
-    // Update is called once per frame
     void Update()
     {
-
+        if ( isMoving )
+        {
+            //var distanceToCover = desiredPosition - startPos;
+            //var distanceCovered = desiredPosition - transform.localPosition;
+            //var completion = distanceCovered.y / distanceToCover.y;
+            //Debug.Log( completion );
+            var deltaTime = Time.deltaTime;
+            var delta = desiredPosition - transform.localPosition;
+            if ( delta.magnitude <= 0.01 * gameBoard.BlockSpeed )
+            {
+                transform.localPosition = desiredPosition;
+                isMoving = false;
+            }
+            else
+                //transform.localEulerAngles = Vector3.MoveTowards( transform.localPosition, desiredPosition, deltaTime * gameBoard.BlockSpeed );
+                //transform.localPosition = Vector3.MoveTowards( transform.localPosition, desiredPosition, deltaTime * gameBoard.BlockSpeed * gameBoard.MoveCurve.Evaluate( completion ) );
+                transform.Translate( new Vector3( delta.x, delta.y ).normalized * gameBoard.BlockSpeed * deltaTime );
+        }
     }
 
     void OnGUI()
     {
         if ( GUI.Button( new Rect( 100, 100, 200, 100 ), "Move me" ) )
         {
-            Move( new Vector2( 0, BoardPosition.y ) + Vector2.one );
+            Move( new Vector2( 0, BoardPosition.y + 1 ) );
         }
     }
 
