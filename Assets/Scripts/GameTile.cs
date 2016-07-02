@@ -1,8 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
+using System.Linq;
+using UnityEngine.EventSystems;
 
-public class GameTile : MonoBehaviour
+public class GameTile : MonoBehaviour, IPointerClickHandler
 {
     [SerializeField]
     TileColor color;
@@ -77,12 +79,10 @@ public class GameTile : MonoBehaviour
         }
     }
 
-    void OnGUI()
+    public void OnPointerClick( PointerEventData eventData )
     {
-        if ( GUI.Button( new Rect( 100, 100, 200, 100 ), "Move me" ) )
-        {
-            Move( new Vector2( 0, BoardPosition.y + 1 ) );
-        }
+        //Debug.Log( "Clicked " + gameObject.name );
+        Move( new Vector2( 0, BoardPosition.y + 1 ) );
     }
 
     public enum TileColor
