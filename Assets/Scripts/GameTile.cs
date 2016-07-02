@@ -23,6 +23,9 @@ namespace TechDrop.Gameplay
         //TODO: Expose events finishedMoving
         bool isMoving = false;
 
+        public event TileEventHandler TileClicked;
+        public event TileEventHandler MovingFinished;
+
         public Vector2 BoardPosition
         {
             get
@@ -57,11 +60,14 @@ namespace TechDrop.Gameplay
             var delta = destination - boardPosition;
             var size = rendererComponent.bounds.size;
             var localCoordinatesDelta = new Vector3( delta.x, delta.y * -1 ) * size.y;
-            desiredPosition = transform.localPosition + localCoordinatesDelta;
-            BoardPosition = destination;
-            isMoving = true;
+            if ( localCoordinatesDelta.magnitude > 0 )
+            {
+                desiredPosition = transform.localPosition + localCoordinatesDelta;
+                BoardPosition = destination;
+                isMoving = true;
 
-            RotateClockwise( gameBoard.BlockSpeed, localCoordinatesDelta.magnitude );
+                RotateClockwise( gameBoard.BlockSpeed, localCoordinatesDelta.magnitude );
+            }
         }
 
         public void SetColor( TileColor newColor, Sprite newSprite )
@@ -76,7 +82,7 @@ namespace TechDrop.Gameplay
             transform.localPosition = gameBoard.Anchor + new Vector3( destination.x, destination.y * -1 ) * rendererComponent.bounds.size.y;
         }
 
-        public void Initialize(GameBoard game)
+        public void Initialize( GameBoard game )
         {
             gameBoard = game;
             Assert.IsNotNull( gameBoard );
@@ -96,14 +102,18 @@ namespace TechDrop.Gameplay
             {
                 transform.localPosition = Vector3.MoveTowards( transform.localPosition, desiredPosition, Time.deltaTime * gameBoard.BlockSpeed );
                 if ( desiredPosition == transform.localPosition )
+                {
                     isMoving = false;
+                    if ( MovingFinished != null )
+                        MovingFinished( this );
+                }
             }
         }
 
         public void OnPointerClick( PointerEventData eventData )
         {
-            //Debug.Log( "Clicked " + gameObject.name );
-            MoveTo( new Vector2( 0, BoardPosition.y + 1 ) );
+            if ( TileClicked != null )
+                TileClicked( this );
         }
 
         private void RotateClockwise( float speed, float distance )

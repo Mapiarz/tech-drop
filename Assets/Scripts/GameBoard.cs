@@ -59,6 +59,8 @@ namespace TechDrop.Gameplay
         void Awake()
         {
             Assert.IsTrue( BlockSpeed > 0f );
+            Assert.IsTrue( tileColors.Count > 0 );
+
             var random = new System.Random();
 
             tiles = new GameTile[( int )Dimensions.x, ( int )Dimensions.y];
@@ -73,12 +75,19 @@ namespace TechDrop.Gameplay
                     tiles[i, j] = tileGameObject.GetComponent<GameTile>();
                     tiles[i, j].Initialize( this );
                     tiles[i, j].Teleport( new Vector2( i, j ) );
+                    tiles[i, j].TileClicked += GameBoard_TileClicked;
 
                     var colorIndex = random.Next( 0, tileColors.Count );
                     var randomColor = tileColors[colorIndex];
                     tiles[i, j].SetColor( randomColor.Color, randomColor.Sprite );
                 }
             }
+        }
+
+        private void GameBoard_TileClicked( GameTile tile )
+        {
+            if ( tile != null )
+                tile.MoveTo( tile.BoardPosition + Vector2.one );
         }
     }
 }
