@@ -7,34 +7,34 @@ namespace TechDrop.Gameplay
     [Serializable]
     public struct BoardPosition
     {
-        [SerializeField] int x;
-        [SerializeField] int y;
+        [SerializeField] int column;
+        [SerializeField] int row;
 
-        public int X
+        public int Column
         {
-            get { return x; }
-            set { x = value; }
+            get { return column; }
+            set { column = value; }
         }
-        public int Y
+        public int Row
         {
-            get { return y; }
-            set { y = value; }
+            get { return row; }
+            set { row = value; }
         }
 
-        public BoardPosition( int x, int y )
+        public BoardPosition( int column, int row )
         {
-            this.x = x;
-            this.y = y;
+            this.column = column;
+            this.row = row;
         }
 
         public static BoardPosition operator +( BoardPosition bp1, BoardPosition bp2 )
         {
-            return new BoardPosition( bp1.X + bp2.X, bp1.Y + bp2.Y );
+            return new BoardPosition( bp1.Column + bp2.Column, bp1.Row + bp2.Row );
         }
 
         public static BoardPosition operator -( BoardPosition bp1, BoardPosition bp2 )
         {
-            return new BoardPosition( bp1.X - bp2.X, bp1.Y - bp2.Y );
+            return new BoardPosition( bp1.Column - bp2.Column, bp1.Row - bp2.Row );
         }
     }
 }

@@ -10,23 +10,29 @@ namespace TechDrop.Gameplay
     [Serializable]
     public class GameBoard : MonoBehaviour
     {
-        [SerializeField] BoardPosition dimensions;
-        [SerializeField] Vector3 anchor;
-        [SerializeField] float blockSpeed = 1f;
-        [SerializeField] List<TileSprite> tileColors = new List<TileSprite>();
+        [SerializeField]
+        BoardPosition boardSize;
+        [SerializeField]
+        Vector3 anchor;
+        [SerializeField]
+        float blockSpeed = 1f;
+        [SerializeField]
+        int neighbourThreshold = 3;
+        [SerializeField]
+        List<TileSprite> tileColors = new List<TileSprite>();
 
         GameTile[,] tiles;
 
-        public BoardPosition Dimensions
+        public BoardPosition BoardSize
         {
             get
             {
-                return dimensions;
+                return boardSize;
             }
 
             set
             {
-                dimensions = value;
+                boardSize = value;
             }
         }
 
@@ -63,11 +69,11 @@ namespace TechDrop.Gameplay
 
             var random = new System.Random();
 
-            tiles = new GameTile[Dimensions.X, Dimensions.Y];
+            tiles = new GameTile[BoardSize.Column, BoardSize.Row];
 
-            for ( int i = 0; i < Dimensions.X; i++ )
+            for ( int i = 0; i < BoardSize.Column; i++ )
             {
-                for ( int j = 0; j < Dimensions.Y; j++ )
+                for ( int j = 0; j < BoardSize.Row; j++ )
                 {
                     var tileGameObject = UnityEngine.Object.Instantiate( Resources.Load( "Game Tile" ) ) as GameObject;
                     tileGameObject.transform.SetParent( transform );
@@ -86,24 +92,59 @@ namespace TechDrop.Gameplay
 
         private void GameBoard_TileClicked( GameTile tile )
         {
-            //if ( tile != null )
-            //    tile.MoveTo( tile.BoardPosition + Vector2.one );
-
-            //Debug.Log( neighbours.Count );
-
             var sameColorNeighbours = FindNeighbours( tile, new List<GameTile>() );
             Debug.Log( "Neighbour count: " + sameColorNeighbours.Count.ToString() );
 
-            foreach ( var item in sameColorNeighbours )
+            // Destroy the tiles
+            if ( sameColorNeighbours.Count >= neighbourThreshold )
             {
-                GameObject.Destroy( item.gameObject );
+                foreach ( var item in sameColorNeighbours )
+                {
+                    tiles[item.BoardPosition.Column, item.BoardPosition.Row] = null;
+                }
 
+                // Go over colums which had blocks destroyed and update them
+                foreach ( var destroyedBlock in sameColorNeighbours )
+                {
+                    for ( int i = BoardSize.Row - 1; i >= 0; i-- ) // Start from the bottom so we don't overwrite existing blocks
+                    {
+                        var tileToShift = tiles[destroyedBlock.BoardPosition.Column, i];
+                        if ( tileToShift != null )
+                        {
+                            var shiftBy = BlocksDestroyedBelow( tileToShift.BoardPosition );
+                            tiles[tileToShift.BoardPosition.Column, tileToShift.BoardPosition.Row] = null;
+                            tiles[tileToShift.BoardPosition.Column, tileToShift.BoardPosition.Row + shiftBy] = tileToShift;
+                            tileToShift.MoveTo( new BoardPosition( tileToShift.BoardPosition.Column, tileToShift.BoardPosition.Row + shiftBy ) );
+                        }
+                    }
+                }
+
+                foreach ( var item in sameColorNeighbours )
+                {
+                    //GameObject.Destroy( item.gameObject );
+                    item.gameObject.SetActive( false );
+                }
             }
+
+            //TODO: Add finished moving callback so we cant click, if something is moving
+
+        }
+
+        private int BlocksDestroyedBelow( BoardPosition pos )
+        {
+            int result = 0;
+            for ( int i = pos.Row; i < BoardSize.Row; i++ )
+            {
+                if ( tiles[pos.Column, i] == null )
+                    result++;
+            }
+
+            return result;
         }
 
         private List<GameTile> FindNeighbours( GameTile tile, List<GameTile> alreadyVisited )
         {
-            if ( alreadyVisited.Contains( tile ) )
+            if ( tile == null || alreadyVisited.Contains( tile ) )
                 return alreadyVisited;
 
             alreadyVisited.Add( tile );
@@ -111,7 +152,7 @@ namespace TechDrop.Gameplay
 
             foreach ( var neighbour in neighbours )
             {
-                if(neighbour.Color == tile.Color)
+                if ( neighbour.Color == tile.Color )
                 {
                     FindNeighbours( neighbour, alreadyVisited );
                 }
@@ -120,26 +161,29 @@ namespace TechDrop.Gameplay
             return alreadyVisited;
         }
 
-        private List<GameTile> GetImmidiateNeighbours(GameTile tile)
+        private List<GameTile> GetImmidiateNeighbours( GameTile tile )
         {
-            var result = new List<GameTile>();
+            var neighbours = new List<GameTile>();
 
-            int positionX = tile.BoardPosition.X;
-            int positionY = tile.BoardPosition.Y;
-            int maxColumnIndex = Dimensions.X - 1;
-            int maxRowIndex = Dimensions.Y - 1;
-
+            int positionX = tile.BoardPosition.Column;
+            int positionY = tile.BoardPosition.Row;
+            int maxColumnIndex = BoardSize.Column - 1;
+            int maxRowIndex = BoardSize.Row - 1;
 
             if ( positionY < maxRowIndex )
-                result.Add( tiles[positionX, positionY + 1] );
+                if ( tiles[positionX, positionY + 1] != null )
+                    neighbours.Add( tiles[positionX, positionY + 1] );
             if ( positionY > 0 )
-                result.Add( tiles[positionX, positionY - 1] );
+                if ( tiles[positionX, positionY - 1] != null )
+                    neighbours.Add( tiles[positionX, positionY - 1] );
             if ( positionX < maxColumnIndex )
-                result.Add( tiles[positionX + 1, positionY] );
+                if ( tiles[positionX + 1, positionY] != null )
+                    neighbours.Add( tiles[positionX + 1, positionY] );
             if ( positionX > 0 )
-                result.Add( tiles[positionX - 1, positionY] );
+                if ( tiles[positionX - 1, positionY] != null )
+                    neighbours.Add( tiles[positionX - 1, positionY] );
 
-            return result;
+            return neighbours;
         }
     }
 }

@@ -57,7 +57,7 @@ namespace TechDrop.Gameplay
 
             var delta = destination - boardPosition;
             var size = rendererComponent.bounds.size;
-            var localCoordinatesDelta = new Vector3( delta.X, delta.Y * -1 ) * size.y;
+            var localCoordinatesDelta = new Vector3( delta.Column, delta.Row * -1 ) * size.y;
             if ( localCoordinatesDelta.magnitude > 0 )
             {
                 desiredPosition = transform.localPosition + localCoordinatesDelta;
@@ -77,7 +77,7 @@ namespace TechDrop.Gameplay
         public void Teleport( BoardPosition destination )
         {
             BoardPosition = destination;
-            transform.localPosition = gameBoard.Anchor + new Vector3( destination.X, destination.Y * -1 ) * rendererComponent.bounds.size.y;
+            transform.localPosition = gameBoard.Anchor + new Vector3( destination.Column, destination.Row * -1 ) * rendererComponent.bounds.size.y;
         }
 
         public void Initialize( GameBoard game )
