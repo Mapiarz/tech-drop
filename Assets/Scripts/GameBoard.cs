@@ -91,15 +91,20 @@ namespace TechDrop.Gameplay
 
             //Debug.Log( neighbours.Count );
 
-            var count = FindNeighbours( tile, new List<GameTile>() );
-            Debug.Log( "Neighbour count: " + count.ToString() );
+            var sameColorNeighbours = FindNeighbours( tile, new List<GameTile>() );
+            Debug.Log( "Neighbour count: " + sameColorNeighbours.Count.ToString() );
 
+            foreach ( var item in sameColorNeighbours )
+            {
+                GameObject.Destroy( item.gameObject );
+
+            }
         }
 
-        private int FindNeighbours( GameTile tile, List<GameTile> alreadyVisited )
+        private List<GameTile> FindNeighbours( GameTile tile, List<GameTile> alreadyVisited )
         {
             if ( alreadyVisited.Contains( tile ) )
-                return 0;
+                return alreadyVisited;
 
             alreadyVisited.Add( tile );
             var neighbours = GetImmidiateNeighbours( tile );
@@ -112,7 +117,7 @@ namespace TechDrop.Gameplay
                 }
             }
 
-            return alreadyVisited.Count;
+            return alreadyVisited;
         }
 
         private List<GameTile> GetImmidiateNeighbours(GameTile tile)
