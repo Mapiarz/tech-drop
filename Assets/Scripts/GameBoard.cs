@@ -10,14 +10,10 @@ namespace TechDrop.Gameplay
     [Serializable]
     public class GameBoard : MonoBehaviour
     {
-        [SerializeField]
-        Vector2 dimensions;
-        [SerializeField]
-        Vector3 anchor;
-        [SerializeField]
-        float blockSpeed = 1f;
-        [SerializeField]
-        List<TileSprite> TileColors = new List<TileSprite>();
+        [SerializeField] Vector2 dimensions;
+        [SerializeField] Vector3 anchor;
+        [SerializeField] float blockSpeed = 1f;
+        [SerializeField] List<TileSprite> tileColors = new List<TileSprite>();
 
         GameTile[,] tiles;
 
@@ -63,6 +59,7 @@ namespace TechDrop.Gameplay
         void Awake()
         {
             Assert.IsTrue( BlockSpeed > 0f );
+            var random = new System.Random();
 
             tiles = new GameTile[( int )Dimensions.x, ( int )Dimensions.y];
 
@@ -77,16 +74,10 @@ namespace TechDrop.Gameplay
                     tiles[i, j].Initialize( this );
                     tiles[i, j].Teleport( new Vector2( i, j ) );
 
+                    var colorIndex = random.Next( 0, tileColors.Count );
+                    var randomColor = tileColors[colorIndex];
+                    tiles[i, j].SetColor( randomColor.Color, randomColor.Sprite );
                 }
-            }
-        }
-
-
-        void OnGUI()
-        {
-            if ( GUI.Button( new Rect( 0, 100, 200, 100 ), "Change Color" ) )
-            {
-                transform.FindChild( "Game Tile" ).GetComponent<GameTile>().SetColor( TileColor.Red, TileColors.First( x => x.Color == TileColor.Red ).Sprite );
             }
         }
     }
