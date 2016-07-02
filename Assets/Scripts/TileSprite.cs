@@ -2,45 +2,48 @@
 using System.Collections;
 using System;
 
-[Serializable]
-public class TileSprite
+namespace TechDrop.Gameplay
 {
-    [SerializeField] private TileColor color;
-    [SerializeField] private Sprite sprite;
-
-    public TileColor Color
+    [Serializable]
+    public class TileSprite
     {
-        get
+        [SerializeField] private TileColor color;
+        [SerializeField] private Sprite sprite;
+
+        public TileColor Color
         {
-            return color;
+            get
+            {
+                return color;
+            }
+
+            set
+            {
+                color = value;
+            }
         }
 
-        set
+        public Sprite Sprite
         {
-            color = value;
+            get
+            {
+                return sprite;
+            }
+
+            set
+            {
+                sprite = value;
+            }
         }
     }
 
-    public Sprite Sprite
+    [Serializable]
+    public enum TileColor
     {
-        get
-        {
-            return sprite;
-        }
-
-        set
-        {
-            sprite = value;
-        }
+        Red,
+        Purple,
+        Green,
+        Blue,
+        Grey
     }
-}
-
-[Serializable]
-public enum TileColor
-{
-    Red,
-    Purple,
-    Green,
-    Blue,
-    Grey
 }

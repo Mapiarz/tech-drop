@@ -5,67 +5,66 @@ using System.Collections.Generic;
 using System;
 using System.Linq;
 
-[Serializable]
-public class GameBoard : MonoBehaviour
+namespace TechDrop.Gameplay
 {
-    [SerializeField]
-    Vector2 dimensions;
-    [SerializeField]
-    Vector3 anchor;
-    [SerializeField]
-    float blockSpeed = 1f;
-    [SerializeField]
-    List<TileSprite> TileColors = new List<TileSprite>();
-
-    public Vector2 Dimensions
+    [Serializable]
+    public class GameBoard : MonoBehaviour
     {
-        get
+        [SerializeField] Vector2 dimensions;
+        [SerializeField] Vector3 anchor;
+        [SerializeField] float blockSpeed = 1f;
+        [SerializeField] List<TileSprite> TileColors = new List<TileSprite>();
+
+        public Vector2 Dimensions
         {
-            return dimensions;
+            get
+            {
+                return dimensions;
+            }
+
+            set
+            {
+                dimensions = value;
+            }
         }
 
-        set
+        public Vector3 Anchor
         {
-            dimensions = value;
-        }
-    }
+            get
+            {
+                return anchor;
+            }
 
-    public Vector3 Anchor
-    {
-        get
-        {
-            return anchor;
-        }
-
-        set
-        {
-            anchor = value;
-        }
-    }
-
-    public float BlockSpeed
-    {
-        get
-        {
-            return blockSpeed;
+            set
+            {
+                anchor = value;
+            }
         }
 
-        set
+        public float BlockSpeed
         {
-            blockSpeed = value;
+            get
+            {
+                return blockSpeed;
+            }
+
+            set
+            {
+                blockSpeed = value;
+            }
         }
-    }
 
-    void Awake()
-    {
-        Assert.IsTrue( BlockSpeed > 0f );
-    }
-
-    void OnGUI()
-    {
-        if ( GUI.Button( new Rect( 100, 100, 200, 100 ), "Change Color" ) )
+        void Awake()
         {
-            transform.FindChild( "Game Tile" ).GetComponent<GameTile>().SetColor( TileColor.Red, TileColors.First( x => x.Color == TileColor.Red ).Sprite );
+            Assert.IsTrue( BlockSpeed > 0f );
+        }
+
+        void OnGUI()
+        {
+            if ( GUI.Button( new Rect( 100, 100, 200, 100 ), "Change Color" ) )
+            {
+                transform.FindChild( "Game Tile" ).GetComponent<GameTile>().SetColor( TileColor.Red, TileColors.First( x => x.Color == TileColor.Red ).Sprite );
+            }
         }
     }
 }
