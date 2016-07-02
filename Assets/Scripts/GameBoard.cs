@@ -86,8 +86,55 @@ namespace TechDrop.Gameplay
 
         private void GameBoard_TileClicked( GameTile tile )
         {
-            if ( tile != null )
-                tile.MoveTo( tile.BoardPosition + Vector2.one );
+            //if ( tile != null )
+            //    tile.MoveTo( tile.BoardPosition + Vector2.one );
+
+            //Debug.Log( neighbours.Count );
+
+            var count = FindNeighbours( tile, new List<GameTile>() );
+            Debug.Log( "Neighbour count: " + count.ToString() );
+
+        }
+
+        private int FindNeighbours( GameTile tile, List<GameTile> alreadyVisited )
+        {
+            if ( alreadyVisited.Contains( tile ) )
+                return 0;
+
+            alreadyVisited.Add( tile );
+            var neighbours = GetImmidiateNeighbours( tile );
+
+            foreach ( var neighbour in neighbours )
+            {
+                if(neighbour.Color == tile.Color)
+                {
+                    FindNeighbours( neighbour, alreadyVisited );
+                }
+            }
+
+            return alreadyVisited.Count;
+        }
+
+        private List<GameTile> GetImmidiateNeighbours(GameTile tile)
+        {
+            var result = new List<GameTile>();
+
+            int positionX = ( int )tile.BoardPosition.x;
+            int positionY = ( int )tile.BoardPosition.y;
+            int maxColumnIndex = ( int )Dimensions.x - 1;
+            int maxRowIndex = ( int )Dimensions.y - 1;
+
+
+            if ( positionY < maxRowIndex )
+                result.Add( tiles[positionX, positionY + 1] );
+            if ( positionY > 0 )
+                result.Add( tiles[positionX, positionY - 1] );
+            if ( positionX < maxColumnIndex )
+                result.Add( tiles[positionX + 1, positionY] );
+            if ( positionX > 0 )
+                result.Add( tiles[positionX - 1, positionY] );
+
+            return result;
         }
     }
 }
