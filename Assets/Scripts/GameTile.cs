@@ -13,7 +13,7 @@ namespace TechDrop.Gameplay
         [SerializeField]
         TileColor color;
         [SerializeField]
-        Vector2 boardPosition;
+        BoardPosition boardPosition;
         Vector3 desiredPosition;
 
         GameBoard gameBoard;
@@ -24,7 +24,7 @@ namespace TechDrop.Gameplay
         public event TileEventHandler TileClicked;
         public event TileEventHandler MovingFinished;
 
-        public Vector2 BoardPosition
+        public BoardPosition BoardPosition
         {
             get
             {
@@ -50,14 +50,14 @@ namespace TechDrop.Gameplay
             }
         }
 
-        public void MoveTo( Vector2 destination )
+        public void MoveTo( BoardPosition destination )
         {
             if ( isMoving )
                 return;
 
             var delta = destination - boardPosition;
             var size = rendererComponent.bounds.size;
-            var localCoordinatesDelta = new Vector3( delta.x, delta.y * -1 ) * size.y;
+            var localCoordinatesDelta = new Vector3( delta.X, delta.Y * -1 ) * size.y;
             if ( localCoordinatesDelta.magnitude > 0 )
             {
                 desiredPosition = transform.localPosition + localCoordinatesDelta;
@@ -74,10 +74,10 @@ namespace TechDrop.Gameplay
             rendererComponent.sprite = newSprite;
         }
 
-        public void Teleport( Vector2 destination )
+        public void Teleport( BoardPosition destination )
         {
             BoardPosition = destination;
-            transform.localPosition = gameBoard.Anchor + new Vector3( destination.x, destination.y * -1 ) * rendererComponent.bounds.size.y;
+            transform.localPosition = gameBoard.Anchor + new Vector3( destination.X, destination.Y * -1 ) * rendererComponent.bounds.size.y;
         }
 
         public void Initialize( GameBoard game )

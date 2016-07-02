@@ -10,14 +10,14 @@ namespace TechDrop.Gameplay
     [Serializable]
     public class GameBoard : MonoBehaviour
     {
-        [SerializeField] Vector2 dimensions;
+        [SerializeField] BoardPosition dimensions;
         [SerializeField] Vector3 anchor;
         [SerializeField] float blockSpeed = 1f;
         [SerializeField] List<TileSprite> tileColors = new List<TileSprite>();
 
         GameTile[,] tiles;
 
-        public Vector2 Dimensions
+        public BoardPosition Dimensions
         {
             get
             {
@@ -63,18 +63,18 @@ namespace TechDrop.Gameplay
 
             var random = new System.Random();
 
-            tiles = new GameTile[( int )Dimensions.x, ( int )Dimensions.y];
+            tiles = new GameTile[Dimensions.X, Dimensions.Y];
 
-            for ( int i = 0; i < Dimensions.x; i++ )
+            for ( int i = 0; i < Dimensions.X; i++ )
             {
-                for ( int j = 0; j < Dimensions.y; j++ )
+                for ( int j = 0; j < Dimensions.Y; j++ )
                 {
                     var tileGameObject = UnityEngine.Object.Instantiate( Resources.Load( "Game Tile" ) ) as GameObject;
                     tileGameObject.transform.SetParent( transform );
 
                     tiles[i, j] = tileGameObject.GetComponent<GameTile>();
                     tiles[i, j].Initialize( this );
-                    tiles[i, j].Teleport( new Vector2( i, j ) );
+                    tiles[i, j].Teleport( new BoardPosition( i, j ) );
                     tiles[i, j].TileClicked += GameBoard_TileClicked;
 
                     var colorIndex = random.Next( 0, tileColors.Count );
@@ -119,10 +119,10 @@ namespace TechDrop.Gameplay
         {
             var result = new List<GameTile>();
 
-            int positionX = ( int )tile.BoardPosition.x;
-            int positionY = ( int )tile.BoardPosition.y;
-            int maxColumnIndex = ( int )Dimensions.x - 1;
-            int maxRowIndex = ( int )Dimensions.y - 1;
+            int positionX = tile.BoardPosition.X;
+            int positionY = tile.BoardPosition.Y;
+            int maxColumnIndex = Dimensions.X - 1;
+            int maxRowIndex = Dimensions.Y - 1;
 
 
             if ( positionY < maxRowIndex )
