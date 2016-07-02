@@ -12,6 +12,7 @@ public class GameBoard : MonoBehaviour
     void Awake()
     {
         Assert.IsNotNull( MoveCurve );
+        Assert.IsTrue( BlockSpeed > 0f );
     }
 
     // Use this for initialization

@@ -56,11 +56,12 @@ public class GameTile : MonoBehaviour, IPointerClickHandler
         //TODO: Consider PositionChanged in property setter
         var delta = destination - boardPosition;
         var size = GetComponent<SpriteRenderer>().bounds.size;
-        desiredPosition = transform.localPosition + ( new Vector3( delta.x, delta.y * -1 ) * size.y );
+        var localCoordinatesDelta = new Vector3( delta.x, delta.y * -1 ) * size.y;
+        desiredPosition = transform.localPosition + localCoordinatesDelta;
         BoardPosition = destination;
         isMoving = true;
 
-        RotateClockwise();
+        RotateClockwise( gameBoard.BlockSpeed, localCoordinatesDelta.y );
     }
 
     private void Teleport( Vector2 destination )
@@ -94,8 +95,11 @@ public class GameTile : MonoBehaviour, IPointerClickHandler
         Move( new Vector2( 0, BoardPosition.y + 1 ) );
     }
 
-    private void RotateClockwise()
+    private void RotateClockwise( float speed, float distance )
     {
+        var animationDuration = speed / Mathf.Abs( distance ); // Time it takes to cover the distance
+        animatorComponent.SetFloat( "AnimationDuration", animationDuration );
+
         if ( transform.rotation.eulerAngles.z == 0 )
             animatorComponent.Play( "RotateClockWiseTo90", 0, 0 );
         else if ( transform.rotation.eulerAngles.z == 360 - 90 )
