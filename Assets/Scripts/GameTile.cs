@@ -16,6 +16,10 @@ public class GameTile : MonoBehaviour, IPointerClickHandler
 
     GameBoard gameBoard;
     Animator animatorComponent;
+    SpriteRenderer rendererComponent;
+    //TODO: Expose property getter
+    //TODO: Expose events finishedMoving
+    bool isMoving = false;
 
     public Vector2 BoardPosition
     {
@@ -37,23 +41,18 @@ public class GameTile : MonoBehaviour, IPointerClickHandler
             return color;
         }
 
-        set
+        private set
         {
             color = value;
-            //TODO: ColorChanged();
         }
     }
 
-
-    //TODO: Expose property getter
-    //TODO: Expose events finishedMoving
-    bool isMoving = false;
-
     public void Move( Vector2 destination )
     {
+        //TODO: Make this MoveTo and this should depend on Dimensions
         if ( isMoving )
             return;
-        //TODO: Consider PositionChanged in property setter
+
         var delta = destination - boardPosition;
         var size = GetComponent<SpriteRenderer>().bounds.size;
         var localCoordinatesDelta = new Vector3( delta.x, delta.y * -1 ) * size.y;
@@ -62,6 +61,13 @@ public class GameTile : MonoBehaviour, IPointerClickHandler
         isMoving = true;
 
         RotateClockwise( gameBoard.BlockSpeed, localCoordinatesDelta.y );
+    }
+
+    public void SetColor( TileColor newColor, Sprite newSprite )
+    {
+        Color = newColor;
+
+        rendererComponent.sprite = newSprite;
     }
 
     private void Teleport( Vector2 destination )
@@ -73,8 +79,10 @@ public class GameTile : MonoBehaviour, IPointerClickHandler
     {
         gameBoard = transform.parent.GetComponent<GameBoard>();
         animatorComponent = transform.GetComponent<Animator>();
+        rendererComponent = transform.GetComponent<SpriteRenderer>();
         Assert.IsNotNull( gameBoard );
         Assert.IsNotNull( animatorComponent );
+        Assert.IsNotNull( rendererComponent );
 
         Teleport( new Vector2( 0, 0 ) );
     }
@@ -110,14 +118,5 @@ public class GameTile : MonoBehaviour, IPointerClickHandler
             animatorComponent.Play( "RotateClockWiseTo360", 0, 0 );
         else
             Debug.LogWarning( "Rotation of the GameTile % 90 != 0" );
-    }
-
-    public enum TileColor
-    {
-        Red,
-        Purple,
-        Green,
-        Blue,
-        Grey
     }
 }
