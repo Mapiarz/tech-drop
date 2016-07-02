@@ -49,44 +49,45 @@ namespace TechDrop.Gameplay
             }
         }
 
-        public void Move( Vector2 destination )
+        public void MoveTo( Vector2 destination )
         {
-            //TODO: Make this MoveTo and this should depend on Dimensions
             if ( isMoving )
                 return;
 
             var delta = destination - boardPosition;
-            var size = GetComponent<SpriteRenderer>().bounds.size;
+            var size = rendererComponent.bounds.size;
             var localCoordinatesDelta = new Vector3( delta.x, delta.y * -1 ) * size.y;
             desiredPosition = transform.localPosition + localCoordinatesDelta;
             BoardPosition = destination;
             isMoving = true;
 
-            RotateClockwise( gameBoard.BlockSpeed, localCoordinatesDelta.y );
+            RotateClockwise( gameBoard.BlockSpeed, localCoordinatesDelta.magnitude );
         }
 
         public void SetColor( TileColor newColor, Sprite newSprite )
         {
             Color = newColor;
-
             rendererComponent.sprite = newSprite;
         }
 
-        private void Teleport( Vector2 destination )
+        public void Teleport( Vector2 destination )
         {
-            transform.localPosition = Vector3.Scale( gameBoard.Anchor, ( new Vector3( destination.x, destination.y ) + Vector3.one ) );
+            BoardPosition = destination;
+            transform.localPosition = gameBoard.Anchor + new Vector3( destination.x, destination.y * -1 ) * rendererComponent.bounds.size.y;
+        }
+
+        public void Initialize(GameBoard game)
+        {
+            gameBoard = game;
+            Assert.IsNotNull( gameBoard );
         }
 
         void Awake()
         {
-            gameBoard = transform.parent.GetComponent<GameBoard>();
             animatorComponent = transform.GetComponent<Animator>();
             rendererComponent = transform.GetComponent<SpriteRenderer>();
-            Assert.IsNotNull( gameBoard );
             Assert.IsNotNull( animatorComponent );
             Assert.IsNotNull( rendererComponent );
-
-            Teleport( new Vector2( 0, 0 ) );
         }
 
         void Update()
@@ -102,7 +103,7 @@ namespace TechDrop.Gameplay
         public void OnPointerClick( PointerEventData eventData )
         {
             //Debug.Log( "Clicked " + gameObject.name );
-            Move( new Vector2( 0, BoardPosition.y + 1 ) );
+            MoveTo( new Vector2( 0, BoardPosition.y + 1 ) );
         }
 
         private void RotateClockwise( float speed, float distance )
