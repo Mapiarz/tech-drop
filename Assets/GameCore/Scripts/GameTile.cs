@@ -76,8 +76,21 @@ namespace TechDrop.Gameplay
 
         public void Teleport( BoardPosition destination )
         {
+            //TODO: Dopisac metode: BoardPositionToLocalPosition i wykorzystac ja tutaj oraz w Move;
             BoardPosition = destination;
-            transform.localPosition = gameBoard.Anchor + new Vector3( destination.Column, destination.Row * -1 ) * rendererComponent.bounds.size.y;
+            //transform.localPosition = gameBoard.Anchor + new Vector3( destination.Column, destination.Row * -1 );// * rendererComponent.bounds.size.y;
+            //Vector2 tileSizeOffest = new Vector2( rendererComponent.bounds.size.x / 2 * transform.localScale.x, rendererComponent.bounds.size.y / 2 * transform.localScale.y );
+            //transform.localPosition = new Vector3( gameBoard.GameBoardArea.x + tileSizeOffest.x, gameBoard.GameBoardArea.y - tileSizeOffest.y ) + new Vector3( destination.Column, destination.Row * -1 ) * rendererComponent.bounds.size.y;
+            //transform.localPosition = gameBoard.GameBoardArea + new Vector3( destination.Column, destination.Row * -1 ) * rendererComponent.bounds.size.y;
+            transform.localPosition = BoardPositionToLocalPosition( destination );
+        }
+
+        private Vector3 BoardPositionToLocalPosition(BoardPosition pos)
+        {
+            Vector2 tileSizeOffest = new Vector2( rendererComponent.bounds.size.x / 2 * transform.localScale.x, rendererComponent.bounds.size.y / 2 * transform.localScale.y );
+            Vector3 localPosition = new Vector3( gameBoard.GameBoardArea.x + tileSizeOffest.x, gameBoard.GameBoardArea.y - tileSizeOffest.y ) + new Vector3( pos.Column, pos.Row * -1 ) * rendererComponent.bounds.size.y;
+
+            return localPosition;
         }
 
         public void Initialize( GameBoard game )

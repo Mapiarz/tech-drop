@@ -11,9 +11,10 @@ namespace TechDrop.Gameplay
     public class GameBoard : MonoBehaviour
     {
         [SerializeField]
-        BoardPosition boardSize;
+        BoardPosition boardDimensions;
         [SerializeField]
-        Vector3 anchor;
+        Rect gameBoardArea;
+
         [SerializeField]
         float blockSpeed = 1f;
         [SerializeField]
@@ -23,29 +24,16 @@ namespace TechDrop.Gameplay
 
         GameTile[,] tiles;
 
-        public BoardPosition BoardSize
+        public BoardPosition BoardDimensions
         {
             get
             {
-                return boardSize;
+                return boardDimensions;
             }
 
             set
             {
-                boardSize = value;
-            }
-        }
-
-        public Vector3 Anchor
-        {
-            get
-            {
-                return anchor;
-            }
-
-            set
-            {
-                anchor = value;
+                boardDimensions = value;
             }
         }
 
@@ -62,6 +50,19 @@ namespace TechDrop.Gameplay
             }
         }
 
+        public Rect GameBoardArea
+        {
+            get
+            {
+                return gameBoardArea;
+            }
+
+            set
+            {
+                gameBoardArea = value;
+            }
+        }
+
         void Awake()
         {
             Assert.IsTrue( BlockSpeed > 0f );
@@ -69,11 +70,11 @@ namespace TechDrop.Gameplay
 
             var random = new System.Random();
 
-            tiles = new GameTile[BoardSize.Column, BoardSize.Row];
+            tiles = new GameTile[BoardDimensions.Column, BoardDimensions.Row];
 
-            for ( int i = 0; i < BoardSize.Column; i++ )
+            for ( int i = 0; i < BoardDimensions.Column; i++ )
             {
-                for ( int j = 0; j < BoardSize.Row; j++ )
+                for ( int j = 0; j < BoardDimensions.Row; j++ )
                 {
                     var tileGameObject = UnityEngine.Object.Instantiate( Resources.Load( "Game Tile" ) ) as GameObject;
                     tileGameObject.transform.SetParent( transform );
@@ -106,7 +107,7 @@ namespace TechDrop.Gameplay
                 // Go over colums which had blocks destroyed and update them
                 foreach ( var destroyedBlock in sameColorNeighbours )
                 {
-                    for ( int i = BoardSize.Row - 1; i >= 0; i-- ) // Start from the bottom so we don't overwrite existing blocks
+                    for ( int i = BoardDimensions.Row - 1; i >= 0; i-- ) // Start from the bottom so we don't overwrite existing blocks
                     {
                         var tileToShift = tiles[destroyedBlock.BoardPosition.Column, i];
                         if ( tileToShift != null )
@@ -127,13 +128,13 @@ namespace TechDrop.Gameplay
             }
 
             //TODO: Add finished moving callback so we cant click, if something is moving
-
+            //TODO: Add 90 degree rotation per row fallen.
         }
 
         private int BlocksDestroyedBelow( BoardPosition pos )
         {
             int result = 0;
-            for ( int i = pos.Row; i < BoardSize.Row; i++ )
+            for ( int i = pos.Row; i < BoardDimensions.Row; i++ )
             {
                 if ( tiles[pos.Column, i] == null )
                     result++;
@@ -167,8 +168,8 @@ namespace TechDrop.Gameplay
 
             int positionX = tile.BoardPosition.Column;
             int positionY = tile.BoardPosition.Row;
-            int maxColumnIndex = BoardSize.Column - 1;
-            int maxRowIndex = BoardSize.Row - 1;
+            int maxColumnIndex = BoardDimensions.Column - 1;
+            int maxRowIndex = BoardDimensions.Row - 1;
 
             if ( positionY < maxRowIndex )
                 if ( tiles[positionX, positionY + 1] != null )
