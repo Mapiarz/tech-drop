@@ -10,10 +10,8 @@ namespace TechDrop.Gameplay
     [RequireComponent( typeof( Collider2D ), typeof( SpriteRenderer ) )]
     public class GameTile : MonoBehaviour, IPointerClickHandler
     {
-        [SerializeField]
-        TileColor color;
-        [SerializeField]
-        BoardPosition boardPosition;
+        [SerializeField] TileColor color;
+        [SerializeField] BoardPosition boardPosition;
         Vector3 desiredPosition;
 
         GameBoard gameBoard;
@@ -57,9 +55,8 @@ namespace TechDrop.Gameplay
 
             var localPos = BoardPositionToLocalPosition( destination );
             var delta = localPos - transform.localPosition;
-            if ( delta.magnitude > 0.01 )
+            if ( delta.magnitude > 0.01 ) // Could be 0 but we want to avoid float precision errors
             {
-                Debug.Log( string.Format( "Position: {0},{1}; Destination: {2},{3}; Delta: {4}", BoardPosition.Column, BoardPosition.Row, destination.Column, destination.Row, delta.magnitude ) );
                 BoardPosition = destination;
                 desiredPosition = localPos;
                 isMoving = true;
