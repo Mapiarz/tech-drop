@@ -10,19 +10,11 @@ namespace TechDrop.Gameplay
     [Serializable]
     public class GameBoard : MonoBehaviour
     {
-        [SerializeField]
-        BoardPosition boardDimensions;
-        [SerializeField]
-        Rect gameBoardArea;
-
-        [SerializeField]
-        float blockSpeed = 1f;
-        [SerializeField]
-        int neighbourThreshold = 3;
-        [SerializeField]
-        List<TileSprite> tileColors = new List<TileSprite>();
-        //public float tileSize = 1f;
-
+        [SerializeField] BoardPosition boardDimensions;
+        [SerializeField] Rect gameBoardArea;
+        [SerializeField] float blockSpeed = 1f;
+        [SerializeField] int neighbourThreshold = 3;
+        [SerializeField] List<TileSprite> tileColors = new List<TileSprite>();
 
         GameTile[,] tiles;
 
@@ -109,7 +101,7 @@ namespace TechDrop.Gameplay
                 // Go over colums which had blocks destroyed and update them
                 foreach ( var destroyedBlock in sameColorNeighbours )
                 {
-                    for ( int i = BoardDimensions.Row - 1; i >= 0; i-- ) // Start from the bottom so we don't overwrite existing blocks
+                    for ( int i = destroyedBlock.BoardPosition.Row - 1; i >= 0; i-- ) // Start from the bottom so we don't overwrite existing blocks
                     {
                         var tileToShift = tiles[destroyedBlock.BoardPosition.Column, i];
                         if ( tileToShift != null )

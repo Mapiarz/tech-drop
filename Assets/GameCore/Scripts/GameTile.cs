@@ -55,27 +55,17 @@ namespace TechDrop.Gameplay
             if ( isMoving )
                 return;
 
-            //var delta = destination - boardPosition;
             var localPos = BoardPositionToLocalPosition( destination );
             var delta = localPos - transform.localPosition;
-            if ( delta.magnitude > 0 )
+            if ( delta.magnitude > 0.01 )
             {
+                Debug.Log( string.Format( "Position: {0},{1}; Destination: {2},{3}; Delta: {4}", BoardPosition.Column, BoardPosition.Row, destination.Column, destination.Row, delta.magnitude ) );
                 BoardPosition = destination;
                 desiredPosition = localPos;
                 isMoving = true;
 
                 RotateClockwise( gameBoard.BlockSpeed, delta.magnitude );
             }
-            //var size = rendererComponent.bounds.size;
-            //var localCoordinatesDelta = new Vector3( delta.Column, delta.Row * -1 ) * size.y;
-            //if ( localCoordinatesDelta.magnitude > 0 )
-            //{
-            //    desiredPosition = transform.localPosition + localCoordinatesDelta;
-            //    BoardPosition = destination;
-            //    isMoving = true;
-
-            //    RotateClockwise( gameBoard.BlockSpeed, localCoordinatesDelta.magnitude );
-            //}
         }
 
         public void SetColor( TileColor newColor, Sprite newSprite )
@@ -86,12 +76,7 @@ namespace TechDrop.Gameplay
 
         public void Teleport( BoardPosition destination )
         {
-            //TODO: Dopisac metode: BoardPositionToLocalPosition i wykorzystac ja tutaj oraz w Move;
             BoardPosition = destination;
-            //transform.localPosition = gameBoard.Anchor + new Vector3( destination.Column, destination.Row * -1 );// * rendererComponent.bounds.size.y;
-            //Vector2 tileSizeOffest = new Vector2( rendererComponent.bounds.size.x / 2 * transform.localScale.x, rendererComponent.bounds.size.y / 2 * transform.localScale.y );
-            //transform.localPosition = new Vector3( gameBoard.GameBoardArea.x + tileSizeOffest.x, gameBoard.GameBoardArea.y - tileSizeOffest.y ) + new Vector3( destination.Column, destination.Row * -1 ) * rendererComponent.bounds.size.y;
-            //transform.localPosition = gameBoard.GameBoardArea + new Vector3( destination.Column, destination.Row * -1 ) * rendererComponent.bounds.size.y;
             transform.localPosition = BoardPositionToLocalPosition( destination );
         }
 
@@ -105,9 +90,6 @@ namespace TechDrop.Gameplay
             Vector3 boardPosition = new Vector3( pos.Column * size.x, pos.Row * size.y * -1 );
             Vector3 tileSizeOffset = new Vector3( size.x / 2, -1 * size.x / 2 );
             Vector3 localPosition = boardTopLeftAnchor + boardPosition + padding + tileSizeOffset;
-
-            //Vector2 tileSizeOffest = new Vector2( rendererComponent.bounds.size.x / 2 * transform.localScale.x, rendererComponent.bounds.size.y / 2 * transform.localScale.y );
-            //Vector3 localPosition = new Vector3( gameBoard.GameBoardArea.x + tileSizeOffest.x, gameBoard.GameBoardArea.y - tileSizeOffest.y ) + new Vector3( pos.Column, pos.Row * -1 ) * rendererComponent.bounds.size.x * transform.localScale.x;
 
             return localPosition;
         }
