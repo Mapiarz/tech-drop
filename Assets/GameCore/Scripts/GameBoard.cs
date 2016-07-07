@@ -21,6 +21,8 @@ namespace TechDrop.Gameplay
         int neighbourThreshold = 3;
         [SerializeField]
         List<TileSprite> tileColors = new List<TileSprite>();
+        //public float tileSize = 1f;
+
 
         GameTile[,] tiles;
 

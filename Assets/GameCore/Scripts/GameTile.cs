@@ -55,17 +55,27 @@ namespace TechDrop.Gameplay
             if ( isMoving )
                 return;
 
-            var delta = destination - boardPosition;
-            var size = rendererComponent.bounds.size;
-            var localCoordinatesDelta = new Vector3( delta.Column, delta.Row * -1 ) * size.y;
-            if ( localCoordinatesDelta.magnitude > 0 )
+            //var delta = destination - boardPosition;
+            var localPos = BoardPositionToLocalPosition( destination );
+            var delta = localPos - transform.localPosition;
+            if ( delta.magnitude > 0 )
             {
-                desiredPosition = transform.localPosition + localCoordinatesDelta;
                 BoardPosition = destination;
+                desiredPosition = localPos;
                 isMoving = true;
 
-                RotateClockwise( gameBoard.BlockSpeed, localCoordinatesDelta.magnitude );
+                RotateClockwise( gameBoard.BlockSpeed, delta.magnitude );
             }
+            //var size = rendererComponent.bounds.size;
+            //var localCoordinatesDelta = new Vector3( delta.Column, delta.Row * -1 ) * size.y;
+            //if ( localCoordinatesDelta.magnitude > 0 )
+            //{
+            //    desiredPosition = transform.localPosition + localCoordinatesDelta;
+            //    BoardPosition = destination;
+            //    isMoving = true;
+
+            //    RotateClockwise( gameBoard.BlockSpeed, localCoordinatesDelta.magnitude );
+            //}
         }
 
         public void SetColor( TileColor newColor, Sprite newSprite )
@@ -85,10 +95,19 @@ namespace TechDrop.Gameplay
             transform.localPosition = BoardPositionToLocalPosition( destination );
         }
 
-        private Vector3 BoardPositionToLocalPosition(BoardPosition pos)
+        private Vector3 BoardPositionToLocalPosition( BoardPosition pos )
         {
-            Vector2 tileSizeOffest = new Vector2( rendererComponent.bounds.size.x / 2 * transform.localScale.x, rendererComponent.bounds.size.y / 2 * transform.localScale.y );
-            Vector3 localPosition = new Vector3( gameBoard.GameBoardArea.x + tileSizeOffest.x, gameBoard.GameBoardArea.y - tileSizeOffest.y ) + new Vector3( pos.Column, pos.Row * -1 ) * rendererComponent.bounds.size.y;
+            var size = rendererComponent.bounds.size;
+            float columnPadding = ( gameBoard.GameBoardArea.width - ( gameBoard.BoardDimensions.Column * size.x ) ) / ( gameBoard.BoardDimensions.Column + 1 );
+            float rowPadding = ( gameBoard.GameBoardArea.height - ( gameBoard.BoardDimensions.Row * size.x ) ) / ( gameBoard.BoardDimensions.Row + 1 );
+            Vector3 padding = new Vector3( columnPadding * ( pos.Column + 1 ), rowPadding * ( pos.Row + 1 ) * -1 );
+            Vector3 boardTopLeftAnchor = new Vector3( gameBoard.GameBoardArea.position.x, gameBoard.GameBoardArea.position.y ) - gameBoard.transform.localPosition;
+            Vector3 boardPosition = new Vector3( pos.Column * size.x, pos.Row * size.y * -1 );
+            Vector3 tileSizeOffset = new Vector3( size.x / 2, -1 * size.x / 2 );
+            Vector3 localPosition = boardTopLeftAnchor + boardPosition + padding + tileSizeOffset;
+
+            //Vector2 tileSizeOffest = new Vector2( rendererComponent.bounds.size.x / 2 * transform.localScale.x, rendererComponent.bounds.size.y / 2 * transform.localScale.y );
+            //Vector3 localPosition = new Vector3( gameBoard.GameBoardArea.x + tileSizeOffest.x, gameBoard.GameBoardArea.y - tileSizeOffest.y ) + new Vector3( pos.Column, pos.Row * -1 ) * rendererComponent.bounds.size.x * transform.localScale.x;
 
             return localPosition;
         }

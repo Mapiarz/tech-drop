@@ -12,10 +12,10 @@ namespace TechDrop.EditorComponents
         {
             GameBoard gameBoard = target as GameBoard;
 
-            float left = gameBoard.GameBoardArea.x * gameBoard.transform.localScale.x + gameBoard.transform.localPosition.x;
-            float bottom = gameBoard.GameBoardArea.y * gameBoard.transform.localScale.y + gameBoard.transform.localPosition.y;
-            float width = gameBoard.GameBoardArea.width * gameBoard.transform.localScale.x;
-            float height = gameBoard.GameBoardArea.height * gameBoard.transform.localScale.y;
+            float left = gameBoard.GameBoardArea.x;
+            float bottom = gameBoard.GameBoardArea.y;
+            float width = gameBoard.GameBoardArea.width;
+            float height = gameBoard.GameBoardArea.height;
 
             Vector3[] vertices = new Vector3[4];
             vertices[0] = new Vector3( left, bottom - height, 1.0f ); //Bottom left
@@ -37,6 +37,18 @@ namespace TechDrop.EditorComponents
 
             Vector3 rightHandle = Vector3.Lerp( vertices[2], vertices[3], 0.5f );
             DrawRectHandle( rightHandle, Vector3.right, gameBoard );
+
+            //float columnPadding = ( width - ( gameBoard.BoardDimensions.Column * gameBoard.tileSize ) ) / ( gameBoard.BoardDimensions.Column + 1 );
+            //float rowPadding = ( height - ( gameBoard.BoardDimensions.Row * gameBoard.tileSize ) ) / ( gameBoard.BoardDimensions.Row + 1 );
+
+            //for ( int i = 0; i < gameBoard.BoardDimensions.Column; i++ )
+            //{
+            //    for ( int j = 0; j < gameBoard.BoardDimensions.Row; j++ )
+            //    {
+            //        Rect pos = new Rect( left + i * gameBoard.tileSize + ( ( i + 1 ) * columnPadding ), bottom - j * gameBoard.tileSize - ( ( j + 1 ) * rowPadding ), gameBoard.tileSize, -gameBoard.tileSize );
+            //        Handles.DrawSolidRectangleWithOutline( pos, new Color( 1, 1, 1, 0.1f ), Color.white );
+            //    }
+            //}
         }
 
         private void DrawRectHandle( Vector3 position, Vector3 direction, GameBoard gameBoard )
