@@ -88,7 +88,7 @@ namespace TechDrop.Gameplay
         private void GameBoard_TileClicked( GameTile tile )
         {
             var sameColorNeighbours = FindNeighbours( tile, new List<GameTile>() );
-            //Debug.Log( "Neighbour count: " + sameColorNeighbours.Count.ToString() );
+            Debug.Log( "Neighbour count: " + sameColorNeighbours.Count.ToString() );
 
             // Destroy the tiles
             if ( sameColorNeighbours.Count >= neighbourThreshold )
@@ -96,14 +96,14 @@ namespace TechDrop.Gameplay
                 foreach ( var item in sameColorNeighbours )
                 {
                     tiles[item.BoardPosition.Column, item.BoardPosition.Row] = null;
+
                 }
 
-                // Go over colums which had blocks destroyed and update them
-                foreach ( var destroyedBlock in sameColorNeighbours )
+                for ( int i = 0; i < BoardDimensions.Column; i++ )
                 {
-                    for ( int i = destroyedBlock.BoardPosition.Row - 1; i >= 0; i-- ) // Start from the bottom so we don't overwrite existing blocks
+                    for ( int j = BoardDimensions.Row - 1; j >= 0; j-- ) // Start from the bottom so we don't overwrite existing blocks
                     {
-                        var tileToShift = tiles[destroyedBlock.BoardPosition.Column, i];
+                        var tileToShift = tiles[i, j];
                         if ( tileToShift != null )
                         {
                             var shiftBy = BlocksDestroyedBelow( tileToShift.BoardPosition );
@@ -122,7 +122,6 @@ namespace TechDrop.Gameplay
             }
 
             //TODO: Add finished moving callback so we cant click, if something is moving
-            //TODO: Add 90 degree rotation per row fallen.
         }
 
         private int BlocksDestroyedBelow( BoardPosition pos )
