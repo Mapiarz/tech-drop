@@ -88,7 +88,7 @@ namespace TechDrop.Gameplay
         private void GameBoard_TileClicked( GameTile tile )
         {
             var sameColorNeighbours = FindNeighbours( tile, new List<GameTile>() );
-            Debug.Log( "Neighbour count: " + sameColorNeighbours.Count.ToString() );
+            //Debug.Log( "Neighbour count: " + sameColorNeighbours.Count.ToString() );
 
             // Destroy the tiles
             if ( sameColorNeighbours.Count >= neighbourThreshold )

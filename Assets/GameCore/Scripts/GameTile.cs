@@ -18,6 +18,7 @@ namespace TechDrop.Gameplay
         Animator animatorComponent;
         SpriteRenderer rendererComponent;
         bool isMoving = false;
+        int rotationsLeft = 0;
 
         public event TileEventHandler TileClicked;
         public event TileEventHandler MovingFinished;
@@ -57,11 +58,14 @@ namespace TechDrop.Gameplay
             var delta = localPos - transform.localPosition;
             if ( delta.magnitude > 0.01 ) // Could be 0 but we want to avoid float precision errors
             {
+                // Rotate the tile times the amount the blocks it falls
+                rotationsLeft = destination.Row - BoardPosition.Row;
+
                 BoardPosition = destination;
                 desiredPosition = localPos;
                 isMoving = true;
 
-                RotateClockwise( gameBoard.BlockSpeed, delta.magnitude );
+                RotateClockwise();
             }
         }
 
@@ -125,21 +129,34 @@ namespace TechDrop.Gameplay
                 TileClicked( this );
         }
 
-        private void RotateClockwise( float speed, float distance )
+        private void RotateClockwise()
         {
-            var animationDuration = speed / Mathf.Abs( distance ); // Time it takes to cover the distance
+            // When rotation event fires, the actual rotation value is not i.e. 270 but 270.03456
+            // Due to this error round the number to the nearest multiply of 90
+            var currentRotation = ( ( int )Math.Round( transform.rotation.eulerAngles.z / 90f ) ) * 90f;
+
+            // TODO: Fix bug: at higher speeds blocks are still rotating even after landing
+            var animationDuration = gameBoard.BlockSpeed / ( BoardPositionToLocalPosition( new BoardPosition( 0, 1 ) ) - BoardPositionToLocalPosition( new BoardPosition( 0, 0 ) ) ).magnitude;
             animatorComponent.SetFloat( "AnimationDuration", animationDuration );
 
-            if ( transform.rotation.eulerAngles.z == 0 )
+            if ( currentRotation == 0 )
                 animatorComponent.Play( "RotateClockWiseTo90", 0, 0 );
-            else if ( transform.rotation.eulerAngles.z == 360 - 90 )
+            else if ( currentRotation == 360 - 90 )
                 animatorComponent.Play( "RotateClockWiseTo180", 0, 0 );
-            else if ( transform.rotation.eulerAngles.z == 360 - 180 )
+            else if ( currentRotation == 360 - 180 )
                 animatorComponent.Play( "RotateClockWiseTo270", 0, 0 );
-            else if ( transform.rotation.eulerAngles.z == 360 - 270 )
+            else if ( currentRotation == 360 - 270 )
                 animatorComponent.Play( "RotateClockWiseTo360", 0, 0 );
             else
                 Debug.LogWarning( "Rotation of the GameTile % 90 != 0" );
+        }
+
+        private void RotationFinished()
+        {
+            rotationsLeft--;
+
+            if ( rotationsLeft > 0 )
+                RotateClockwise();
         }
     }
 }
