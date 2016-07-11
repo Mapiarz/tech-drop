@@ -17,6 +17,8 @@ namespace TechDrop.Gameplay
         [SerializeField] List<TileSprite> tileColors = new List<TileSprite>();
 
         GameTile[,] tiles;
+        bool isLocked = false;
+        int blocksMoving = 0;
 
         public BoardPosition BoardDimensions
         {
@@ -77,6 +79,7 @@ namespace TechDrop.Gameplay
                     tiles[i, j].Initialize( this );
                     tiles[i, j].Teleport( new BoardPosition( i, j ) );
                     tiles[i, j].TileClicked += GameBoard_TileClicked;
+                    tiles[i, j].MovingFinished += GameBoard_MovingFinished;
 
                     var colorIndex = random.Next( 0, tileColors.Count );
                     var randomColor = tileColors[colorIndex];
@@ -87,6 +90,10 @@ namespace TechDrop.Gameplay
 
         private void GameBoard_TileClicked( GameTile tile )
         {
+            // If there are blocks moving and the board is locked, do nothing
+            if ( isLocked )
+                return;
+
             var sameColorNeighbours = FindNeighbours( tile, new List<GameTile>() );
 
             // Destroy the tiles
@@ -105,21 +112,39 @@ namespace TechDrop.Gameplay
                         if ( tileToShift != null )
                         {
                             var shiftBy = BlocksDestroyedBelow( tileToShift.BoardPosition );
-                            tiles[tileToShift.BoardPosition.Column, tileToShift.BoardPosition.Row] = null;
-                            tiles[tileToShift.BoardPosition.Column, tileToShift.BoardPosition.Row + shiftBy] = tileToShift;
-                            tileToShift.MoveTo( new BoardPosition( tileToShift.BoardPosition.Column, tileToShift.BoardPosition.Row + shiftBy ) );
+                            if ( shiftBy > 0 )
+                            {
+                                tiles[tileToShift.BoardPosition.Column, tileToShift.BoardPosition.Row] = null;
+                                tiles[tileToShift.BoardPosition.Column, tileToShift.BoardPosition.Row + shiftBy] = tileToShift;
+                                tileToShift.MoveTo( new BoardPosition( tileToShift.BoardPosition.Column, tileToShift.BoardPosition.Row + shiftBy ) );
+                                blocksMoving++; // Increase the number of blocks that is changing position
+                            }
                         }
                     }
                 }
 
                 foreach ( var item in sameColorNeighbours )
                 {
+                    // Unregister the events
+                    // TODO: Extract a separate method for destroying blocks
+                    item.TileClicked -= GameBoard_TileClicked;
+                    item.MovingFinished -= GameBoard_MovingFinished;
+
                     //GameObject.Destroy( item.gameObject );
                     item.gameObject.SetActive( false );
                 }
-            }
 
-            //TODO: Add finished moving callback so we cant click, if something is moving
+                // Shall we lock the board?
+                isLocked = blocksMoving > 0;
+            }
+        }
+
+        private void GameBoard_MovingFinished( GameTile tile )
+        {
+            blocksMoving--;
+
+            if ( blocksMoving == 0 )
+                isLocked = false;
         }
 
         private int BlocksDestroyedBelow( BoardPosition pos )
