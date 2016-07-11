@@ -123,20 +123,23 @@ namespace TechDrop.Gameplay
                     }
                 }
 
+                // Destroy the tiles
                 foreach ( var item in sameColorNeighbours )
-                {
-                    // Unregister the events
-                    // TODO: Extract a separate method for destroying blocks
-                    item.TileClicked -= GameBoard_TileClicked;
-                    item.MovingFinished -= GameBoard_MovingFinished;
-
-                    //GameObject.Destroy( item.gameObject );
-                    item.gameObject.SetActive( false );
-                }
+                    DestroyTile( item );
 
                 // Shall we lock the board?
                 isLocked = blocksMoving > 0;
             }
+        }
+
+        private void DestroyTile(GameTile tile)
+        {
+            // Unregister the events
+            tile.TileClicked -= GameBoard_TileClicked;
+            tile.MovingFinished -= GameBoard_MovingFinished;
+
+            //GameObject.Destroy( tile.gameObject );
+            tile.gameObject.SetActive( false );
         }
 
         private void GameBoard_MovingFinished( GameTile tile )
