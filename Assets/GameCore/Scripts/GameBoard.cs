@@ -19,6 +19,7 @@ namespace TechDrop.Gameplay
         GameTile[,] tiles;
         bool isLocked = false;
         int blocksMoving = 0;
+        System.Random random = new System.Random();
 
         public BoardPosition BoardDimensions
         {
@@ -64,26 +65,13 @@ namespace TechDrop.Gameplay
             Assert.IsTrue( BlockSpeed > 0f );
             Assert.IsTrue( tileColors.Count > 0 );
 
-            var random = new System.Random();
-
             tiles = new GameTile[BoardDimensions.Column, BoardDimensions.Row];
 
             for ( int i = 0; i < BoardDimensions.Column; i++ )
             {
                 for ( int j = 0; j < BoardDimensions.Row; j++ )
                 {
-                    var tileGameObject = UnityEngine.Object.Instantiate( Resources.Load( "Game Tile" ) ) as GameObject;
-                    tileGameObject.transform.SetParent( transform );
-
-                    tiles[i, j] = tileGameObject.GetComponent<GameTile>();
-                    tiles[i, j].Initialize( this );
-                    tiles[i, j].Teleport( new BoardPosition( i, j ) );
-                    tiles[i, j].TileClicked += GameBoard_TileClicked;
-                    tiles[i, j].MovingFinished += GameBoard_MovingFinished;
-
-                    var colorIndex = random.Next( 0, tileColors.Count );
-                    var randomColor = tileColors[colorIndex];
-                    tiles[i, j].SetColor( randomColor.Color, randomColor.Sprite );
+                    tiles[i, j] = SpawnTile( new BoardPosition( i, j ) );
                 }
             }
         }
@@ -127,19 +115,57 @@ namespace TechDrop.Gameplay
                 foreach ( var item in sameColorNeighbours )
                     DestroyTile( item );
 
+                // Iteratre over columns and spawn new tiles
+                for ( int i = 0; i < BoardDimensions.Column; i++ )
+                {
+                    int nullCount = 0;
+                    for ( int j = 0; j < BoardDimensions.Row; j++ )
+                    {
+                        if ( tiles[i, j] == null )
+                            nullCount++;
+                    }
+
+                    for ( int j = 0; j < nullCount; j++ )
+                    {
+                        var newTile = SpawnTile( new BoardPosition( i, -( j + 1 ) ) );
+                        var destinationRow = nullCount - 1 - j;
+                        newTile.MoveTo( new BoardPosition( i, destinationRow ) );
+                        tiles[i, destinationRow] = newTile;
+                        blocksMoving++;
+                    }
+                }
+
                 // Shall we lock the board?
                 isLocked = blocksMoving > 0;
             }
         }
 
-        private void DestroyTile(GameTile tile)
+        private GameTile SpawnTile( BoardPosition targetPosition )
+        {
+            var tileGameObject = UnityEngine.Object.Instantiate( Resources.Load( "Game Tile" ) ) as GameObject;
+            tileGameObject.transform.SetParent( transform );
+
+            var tileComponent = tileGameObject.GetComponent<GameTile>();
+            tileComponent.Initialize( this );
+            tileComponent.Teleport( targetPosition );
+            tileComponent.TileClicked += GameBoard_TileClicked;
+            tileComponent.MovingFinished += GameBoard_MovingFinished;
+
+            var colorIndex = random.Next( 0, tileColors.Count );
+            var randomColor = tileColors[colorIndex];
+            tileComponent.SetColor( randomColor.Color, randomColor.Sprite );
+
+            return tileComponent;
+        }
+
+        private void DestroyTile( GameTile tile )
         {
             // Unregister the events
             tile.TileClicked -= GameBoard_TileClicked;
             tile.MovingFinished -= GameBoard_MovingFinished;
 
-            //GameObject.Destroy( tile.gameObject );
-            tile.gameObject.SetActive( false );
+            GameObject.Destroy( tile.gameObject );
+            //tile.gameObject.SetActive( false );
         }
 
         private void GameBoard_MovingFinished( GameTile tile )
