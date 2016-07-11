@@ -136,8 +136,19 @@ namespace TechDrop.Gameplay
             var currentRotation = ( ( int )Math.Round( transform.rotation.eulerAngles.z / 90f ) ) * 90f;
 
             // TODO: Fix bug: at higher speeds blocks are still rotating even after landing
-            var animationDuration = gameBoard.BlockSpeed / ( BoardPositionToLocalPosition( new BoardPosition( 0, 1 ) ) - BoardPositionToLocalPosition( new BoardPosition( 0, 0 ) ) ).magnitude;
-            animatorComponent.SetFloat( "AnimationDuration", animationDuration );
+            var d1 = BoardPositionToLocalPosition( new BoardPosition( 0, 1 ) );
+            var d2 = BoardPositionToLocalPosition( new BoardPosition( 0, 0 ) );
+            var m = ( d1 - d2 ).magnitude;
+
+            var duration = m / gameBoard.BlockSpeed;
+            //var length = 1f;
+            var speed = 1 / duration;
+            var animationDuration = gameBoard.BlockSpeed;
+
+            //Duration: 1
+            //Speed: 1
+
+            animatorComponent.SetFloat( "AnimationSpeed", speed );
 
             if ( currentRotation == 0 )
                 animatorComponent.Play( "RotateClockWiseTo90", 0, 0 );
