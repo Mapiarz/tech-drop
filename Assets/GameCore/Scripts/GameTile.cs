@@ -51,16 +51,13 @@ namespace TechDrop.Gameplay
             }
         }
 
-        Vector3 destinationRotation;
-        Vector3 positionDelta;
-
         public void MoveTo( BoardPosition destination )
         {
             if ( isMoving )
                 return;
 
             //Debug.Log( string.Format( "Moving from: {0},{1} to {2},{3}", BoardPosition.Column, BoardPosition.Row, destination.Column, destination.Row ) );
-
+            // TODO: Clean this code up
             var targetLocalPosition = BoardPositionToLocalPosition( destination );
             var delta = targetLocalPosition - transform.localPosition;
             if ( delta.magnitude > 0.01f ) // Could be 0 but we want to avoid float precision errors
@@ -68,8 +65,6 @@ namespace TechDrop.Gameplay
                 var rotations = destination.Row - BoardPosition.Row;
                 BoardPosition = destination;
                 desiredPosition = targetLocalPosition;
-                positionDelta = desiredPosition - transform.localPosition;
-                destinationRotation = new Vector3( 0, 0, -90 * rotations );
                 desiredRotation = transform.rotation * Quaternion.Euler( 0, 0, -90 * rotations ); // Rotate by 90 degress clockwise
                 isMoving = true;
             }
@@ -127,6 +122,9 @@ namespace TechDrop.Gameplay
                 var degreesPerSecond = 90 / timePerBlock;  // Degrees a second, we need to rotate 90 per each block
 
                 // TODO: Rework to use Lerp instead (possibly having a Mathf.Clamp or something)
+                // TODO: The above isn't needed, this works fine.
+                //transform.position = Vector3.Lerp ()
+
                 transform.Translate( new Vector3( 0, Time.deltaTime * -gameBoard.BlockSpeed, 0 ), Space.World );
                 transform.Rotate( Vector3.forward, Time.deltaTime * -degreesPerSecond, Space.World );
 
@@ -138,17 +136,6 @@ namespace TechDrop.Gameplay
 
                 // x - 1
                 // 90 - 0.75
-
-                //transform.localPosition = Vector3.MoveTowards( transform.localPosition, desiredPosition, Time.deltaTime * gameBoard.BlockSpeed );
-
-                // 90 degrees over the distance to cover, multiplied by block speed and finally by deltaTime.
-                // TODO: replace 0.75 with a proper formula
-                //var speed = 90f * gameBoard.BlockSpeed;
-                //var speed = 90 * gameBoard.BlockSpeed;
-
-                //transform.Rotate( Vector3.forward, speed * Time.deltaTime, Space.Self );
-                //transform.Rotate( desiredRotation.eulerAngles * speed * Time.deltaTime );
-                //transform.rotation = Quaternion.RotateTowards( transform.rotation, desiredRotation, speed * Time.deltaTime );
                 if ( transform.localPosition.y <= desiredPosition.y )
                 {
                     transform.localPosition = desiredPosition;
@@ -159,23 +146,7 @@ namespace TechDrop.Gameplay
 
 
                 }
-                // If we finished rotating by 90 degrees, rotate again
-                //if ( transform.rotation == desiredRotation )
-                //{
-
-                //    desiredRotation *= Quaternion.Euler( 0, 0, -90 );
-                //    //transform.rotation = Quaternion.RotateTowards( transform.rotation, desiredRotation, speed * Time.deltaTime );
-                //    //transform.rotation = Quaternion.RotateTowards( transform.rotation, desiredRotation, speed * Time.deltaTime );
-                //}
-
-
             }
-            //else
-            //{
-            //    var speed = ( 90 / 0.75f ) * gameBoard.BlockSpeed;
-            //    //Debug.Log( string.Format( "Speed: {0}", speed ) );
-            //    transform.rotation = Quaternion.RotateTowards( transform.rotation, desiredRotation, speed * Time.deltaTime );
-            //}
         }
 
         public void OnPointerClick( PointerEventData eventData )
