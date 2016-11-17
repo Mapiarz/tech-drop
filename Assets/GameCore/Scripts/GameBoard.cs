@@ -52,6 +52,14 @@ namespace TechDrop.Gameplay
             }
         }
 
+        public float BlockSize
+        {
+            get
+            {
+                return GameBoardArea.height / (float)BoardDimensions.Row;
+            }
+        }
+
         public Rect GameBoardArea
         {
             get
@@ -137,7 +145,7 @@ namespace TechDrop.Gameplay
                         var newTile = SpawnTile( new BoardPosition( i, -( j + 1 ) ) );
                         var destinationRow = nullCount - 1 - j;
                         var localPosition = BoardPositionToLocalPosition( new BoardPosition( i, destinationRow ) );
-                        newTile.MoveTo( localPosition, destinationRow + 1);
+                        newTile.MoveTo( localPosition, destinationRow + j + 1);
                         tiles[i, destinationRow] = newTile;
                         blocksMoving++;
                     }
@@ -199,16 +207,17 @@ namespace TechDrop.Gameplay
         private Vector3 BoardPositionToLocalPosition( BoardPosition pos )
         {
             //var size = rendererComponent.bounds.size;
-            var size = GameBoardArea.width / (float)BoardDimensions.Column;
+            var width = GameBoardArea.width / (float)BoardDimensions.Column;
+            var height = GameBoardArea.height / (float)BoardDimensions.Row;
             //float columnPadding = ( gameBoard.GameBoardArea.width - ( gameBoard.BoardDimensions.Column * size.x ) ) / ( gameBoard.BoardDimensions.Column + 1 );
             //float rowPadding = ( gameBoard.GameBoardArea.height - ( gameBoard.BoardDimensions.Row * size.x ) ) / ( gameBoard.BoardDimensions.Row + 1 );
             //Vector3 padding = new Vector3( columnPadding * ( pos.Column + 1 ), rowPadding * ( pos.Row + 1 ) * -1 );
             Vector3 boardTopLeftAnchor = new Vector3( GameBoardArea.position.x, GameBoardArea.position.y ) - transform.localPosition;
             //Vector3 boardPosition = new Vector3( pos.Column * size.x, pos.Row * size.y * -1 );
-            Vector3 tileSizeOffset = new Vector3( size / 2, -1 * size / 2 );
+            Vector3 tileSizeOffset = new Vector3( width / 2, -1 * height / 2 );
             //Vector3 localPosition = boardTopLeftAnchor + boardPosition + padding + tileSizeOffset;
 
-            var localPosition = new Vector3( pos.Column * size, pos.Row * size * -1 ) + boardTopLeftAnchor + tileSizeOffset;
+            var localPosition = new Vector3( pos.Column * width, pos.Row * height * -1 ) + boardTopLeftAnchor + tileSizeOffset;
 
             return localPosition;
         }

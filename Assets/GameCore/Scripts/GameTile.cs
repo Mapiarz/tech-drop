@@ -38,9 +38,6 @@ namespace TechDrop.Gameplay
         public void MoveTo( Vector3 localPosition, int rotations )
         {
             Assert.IsFalse( isMoving );
-            // TODO: Assert isMoving == false?
-            if ( isMoving )
-                return;
 
             //Debug.Log( string.Format( "Moving from: {0},{1} to {2},{3}", BoardPosition.Column, BoardPosition.Row, destination.Column, destination.Row ) );
             // TODO: Clean this code up
@@ -48,13 +45,13 @@ namespace TechDrop.Gameplay
             //var delta = targetLocalPosition - transform.localPosition;
             //if ( delta.magnitude > 0.01f ) // Could be 0 but we want to avoid float precision errors
             //{
-                //var rotations = destination.Row - BoardPosition.Row;
-                desiredPosition = localPosition;
-                desiredRotation = transform.rotation * Quaternion.Euler( 0, 0, -90 * rotations ); // Rotate by 90 degress clockwise
+            //var rotations = destination.Row - BoardPosition.Row;
+            desiredPosition = localPosition;
+            desiredRotation = transform.rotation * Quaternion.Euler( 0, 0, -90 * rotations ); // Rotate by 90 degress clockwise
 
-                //BoardPosition = destination;
+            //BoardPosition = destination;
 
-                isMoving = true;
+            isMoving = true;
             //}
         }
 
@@ -66,8 +63,6 @@ namespace TechDrop.Gameplay
 
         public void Teleport( Vector3 destination )
         {
-            //BoardPosition = destination;
-            //transform.localPosition = BoardPositionToLocalPosition( destination );
             transform.localPosition = destination;
         }
 
@@ -93,7 +88,7 @@ namespace TechDrop.Gameplay
                 var delta = desiredPosition - transform.localPosition;
 
                 // TODO: Change 0.75f to BlockSize or something, accounting for margins and padding
-                var timePerBlock = 0.75f / gameBoard.BlockSpeed;  // Time it takes to move by one block
+                var timePerBlock = gameBoard.BlockSize / gameBoard.BlockSpeed;  // Time it takes to move by one block
                 var degreesPerSecond = 90 / timePerBlock;  // Degrees a second, we need to rotate 90 per each block
 
                 // TODO: Rework to use Lerp instead (possibly having a Mathf.Clamp or something)
