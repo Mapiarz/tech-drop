@@ -10,10 +10,7 @@ namespace TechDrop.Gameplay
     [RequireComponent( typeof( Collider2D ), typeof( SpriteRenderer ) )]
     public class GameTile : MonoBehaviour, IPointerClickHandler
     {
-        [SerializeField]
-        TileColor color;
-        [SerializeField]
-        BoardPosition boardPosition;
+        [SerializeField] TileColor color;
         Vector3 desiredPosition;
         Quaternion desiredRotation;
 
@@ -24,19 +21,6 @@ namespace TechDrop.Gameplay
 
         public event TileEventHandler TileClicked;
         public event TileEventHandler MovingFinished;
-
-        public BoardPosition BoardPosition
-        {
-            get
-            {
-                return boardPosition;
-            }
-            private set
-            {
-                boardPosition = value;
-
-            }
-        }
 
         public TileColor Color
         {
@@ -51,26 +35,27 @@ namespace TechDrop.Gameplay
             }
         }
 
-        public void MoveTo( BoardPosition destination )
+        public void MoveTo( Vector3 localPosition, int rotations )
         {
+            Assert.IsFalse( isMoving );
             // TODO: Assert isMoving == false?
             if ( isMoving )
                 return;
 
             //Debug.Log( string.Format( "Moving from: {0},{1} to {2},{3}", BoardPosition.Column, BoardPosition.Row, destination.Column, destination.Row ) );
             // TODO: Clean this code up
-            var targetLocalPosition = BoardPositionToLocalPosition( destination );
-            var delta = targetLocalPosition - transform.localPosition;
-            if ( delta.magnitude > 0.01f ) // Could be 0 but we want to avoid float precision errors
-            {
-                var rotations = destination.Row - BoardPosition.Row;
-                desiredPosition = targetLocalPosition;
+            //var targetLocalPosition = BoardPositionToLocalPosition( destination );
+            //var delta = targetLocalPosition - transform.localPosition;
+            //if ( delta.magnitude > 0.01f ) // Could be 0 but we want to avoid float precision errors
+            //{
+                //var rotations = destination.Row - BoardPosition.Row;
+                desiredPosition = localPosition;
                 desiredRotation = transform.rotation * Quaternion.Euler( 0, 0, -90 * rotations ); // Rotate by 90 degress clockwise
 
-                BoardPosition = destination;
+                //BoardPosition = destination;
 
                 isMoving = true;
-            }
+            //}
         }
 
         public void SetColor( TileColor newColor, Sprite newSprite )
@@ -79,24 +64,11 @@ namespace TechDrop.Gameplay
             rendererComponent.sprite = newSprite;
         }
 
-        public void Teleport( BoardPosition destination )
+        public void Teleport( Vector3 destination )
         {
-            BoardPosition = destination;
-            transform.localPosition = BoardPositionToLocalPosition( destination );
-        }
-
-        private Vector3 BoardPositionToLocalPosition( BoardPosition pos )
-        {
-            var size = rendererComponent.bounds.size;
-            float columnPadding = ( gameBoard.GameBoardArea.width - ( gameBoard.BoardDimensions.Column * size.x ) ) / ( gameBoard.BoardDimensions.Column + 1 );
-            float rowPadding = ( gameBoard.GameBoardArea.height - ( gameBoard.BoardDimensions.Row * size.x ) ) / ( gameBoard.BoardDimensions.Row + 1 );
-            Vector3 padding = new Vector3( columnPadding * ( pos.Column + 1 ), rowPadding * ( pos.Row + 1 ) * -1 );
-            Vector3 boardTopLeftAnchor = new Vector3( gameBoard.GameBoardArea.position.x, gameBoard.GameBoardArea.position.y ) - gameBoard.transform.localPosition;
-            Vector3 boardPosition = new Vector3( pos.Column * size.x, pos.Row * size.y * -1 );
-            Vector3 tileSizeOffset = new Vector3( size.x / 2, -1 * size.x / 2 );
-            Vector3 localPosition = boardTopLeftAnchor + boardPosition + padding + tileSizeOffset;
-
-            return localPosition;
+            //BoardPosition = destination;
+            //transform.localPosition = BoardPositionToLocalPosition( destination );
+            transform.localPosition = destination;
         }
 
         public void Initialize( GameBoard game )

@@ -10,11 +10,16 @@ namespace TechDrop.Gameplay
     [Serializable]
     public class GameBoard : MonoBehaviour
     {
-        [SerializeField] BoardPosition boardDimensions;
-        [SerializeField] Rect gameBoardArea;
-        [SerializeField] float blockSpeed = 1f;
-        [SerializeField] int neighbourThreshold = 3;
-        [SerializeField] List<TileSprite> tileColors = new List<TileSprite>();
+        [SerializeField]
+        BoardPosition boardDimensions;
+        [SerializeField]
+        Rect gameBoardArea;
+        [SerializeField]
+        float blockSpeed = 1f;
+        [SerializeField]
+        int neighbourThreshold = 3;
+        [SerializeField]
+        List<TileSprite> tileColors = new List<TileSprite>();
 
         GameTile[,] tiles;
         bool isLocked = false;
@@ -82,29 +87,31 @@ namespace TechDrop.Gameplay
             if ( isLocked )
                 return;
 
-            var sameColorNeighbours = FindNeighbours( tile, new List<GameTile>() );
+            var sameColorNeighbours = FindNeighbours( FindPosition(tile), new List<BoardPosition>() );
 
             // Update the board by nullifying the tiles to be removed and shifting tiles down
             if ( sameColorNeighbours.Count >= neighbourThreshold )
             {
                 foreach ( var item in sameColorNeighbours )
                 {
-                    tiles[item.BoardPosition.Column, item.BoardPosition.Row] = null;
+                    DestroyTile( tiles[item.Column, item.Row] );
+                    tiles[item.Column, item.Row] = null;
                 }
 
-                for ( int i = 0; i < BoardDimensions.Column; i++ )
+                for ( int column = 0; column < BoardDimensions.Column; column++ )
                 {
-                    for ( int j = BoardDimensions.Row - 1; j >= 0; j-- ) // Start from the bottom so we don't overwrite existing blocks
+                    for ( int row = BoardDimensions.Row - 1; row >= 0; row-- ) // Start from the bottom so we don't overwrite existing blocks
                     {
-                        var tileToShift = tiles[i, j];
+                        var tileToShift = tiles[column, row];
                         if ( tileToShift != null )
                         {
-                            var shiftBy = BlocksDestroyedBelow( tileToShift.BoardPosition );
+                            var shiftBy = BlocksDestroyedBelow( column, row );
                             if ( shiftBy > 0 )
                             {
-                                tiles[tileToShift.BoardPosition.Column, tileToShift.BoardPosition.Row] = null;
-                                tiles[tileToShift.BoardPosition.Column, tileToShift.BoardPosition.Row + shiftBy] = tileToShift;
-                                tileToShift.MoveTo( new BoardPosition( tileToShift.BoardPosition.Column, tileToShift.BoardPosition.Row + shiftBy ) );
+                                tiles[column, row] = null;
+                                tiles[column, row + shiftBy] = tileToShift;
+                                var localPosition = BoardPositionToLocalPosition( new BoardPosition( column, row + shiftBy ) );
+                                tileToShift.MoveTo( localPosition, shiftBy );
                                 blocksMoving++; // Increase the number of blocks that is changing position
                             }
                         }
@@ -112,8 +119,8 @@ namespace TechDrop.Gameplay
                 }
 
                 // Destroy tile game objects
-                foreach ( var item in sameColorNeighbours )
-                    DestroyTile( item );
+                //foreach ( var item in sameColorNeighbours )
+                //    DestroyTile( tiles[item.Column, item.Row] );
 
                 // Iteratre over columns and spawn new tiles
                 for ( int i = 0; i < BoardDimensions.Column; i++ )
@@ -129,7 +136,8 @@ namespace TechDrop.Gameplay
                     {
                         var newTile = SpawnTile( new BoardPosition( i, -( j + 1 ) ) );
                         var destinationRow = nullCount - 1 - j;
-                        newTile.MoveTo( new BoardPosition( i, destinationRow ) );
+                        var localPosition = BoardPositionToLocalPosition( new BoardPosition( i, destinationRow ) );
+                        newTile.MoveTo( localPosition, destinationRow + 1);
                         tiles[i, destinationRow] = newTile;
                         blocksMoving++;
                     }
@@ -147,7 +155,7 @@ namespace TechDrop.Gameplay
 
             var tileComponent = tileGameObject.GetComponent<GameTile>();
             tileComponent.Initialize( this );
-            tileComponent.Teleport( targetPosition );
+            tileComponent.Teleport( BoardPositionToLocalPosition( targetPosition ) );
             tileComponent.TileClicked += GameBoard_TileClicked;
             tileComponent.MovingFinished += GameBoard_MovingFinished;
 
@@ -176,29 +184,46 @@ namespace TechDrop.Gameplay
                 isLocked = false;
         }
 
-        private int BlocksDestroyedBelow( BoardPosition pos )
+        private int BlocksDestroyedBelow( int column, int row )
         {
             int result = 0;
-            for ( int i = pos.Row; i < BoardDimensions.Row; i++ )
+            for ( int i = row; i < BoardDimensions.Row; i++ )
             {
-                if ( tiles[pos.Column, i] == null )
+                if ( tiles[column, i] == null )
                     result++;
             }
 
             return result;
         }
 
-        private List<GameTile> FindNeighbours( GameTile tile, List<GameTile> alreadyVisited )
+        private Vector3 BoardPositionToLocalPosition( BoardPosition pos )
         {
-            if ( tile == null || alreadyVisited.Contains( tile ) )
+            //var size = rendererComponent.bounds.size;
+            var size = GameBoardArea.width / (float)BoardDimensions.Column;
+            //float columnPadding = ( gameBoard.GameBoardArea.width - ( gameBoard.BoardDimensions.Column * size.x ) ) / ( gameBoard.BoardDimensions.Column + 1 );
+            //float rowPadding = ( gameBoard.GameBoardArea.height - ( gameBoard.BoardDimensions.Row * size.x ) ) / ( gameBoard.BoardDimensions.Row + 1 );
+            //Vector3 padding = new Vector3( columnPadding * ( pos.Column + 1 ), rowPadding * ( pos.Row + 1 ) * -1 );
+            Vector3 boardTopLeftAnchor = new Vector3( GameBoardArea.position.x, GameBoardArea.position.y ) - transform.localPosition;
+            //Vector3 boardPosition = new Vector3( pos.Column * size.x, pos.Row * size.y * -1 );
+            Vector3 tileSizeOffset = new Vector3( size / 2, -1 * size / 2 );
+            //Vector3 localPosition = boardTopLeftAnchor + boardPosition + padding + tileSizeOffset;
+
+            var localPosition = new Vector3( pos.Column * size, pos.Row * size * -1 ) + boardTopLeftAnchor + tileSizeOffset;
+
+            return localPosition;
+        }
+
+        private List<BoardPosition> FindNeighbours( BoardPosition position, List<BoardPosition> alreadyVisited )
+        {
+            if ( alreadyVisited.Contains( position ) )
                 return alreadyVisited;
 
-            alreadyVisited.Add( tile );
-            var neighbours = GetImmidiateNeighbours( tile );
+            alreadyVisited.Add( position );
+            var neighbours = GetImmidiateNeighbours( position );
 
             foreach ( var neighbour in neighbours )
             {
-                if ( neighbour.Color == tile.Color )
+                if ( tiles[neighbour.Column, neighbour.Row].Color == tiles[position.Column, position.Row].Color )
                 {
                     FindNeighbours( neighbour, alreadyVisited );
                 }
@@ -207,29 +232,50 @@ namespace TechDrop.Gameplay
             return alreadyVisited;
         }
 
-        private List<GameTile> GetImmidiateNeighbours( GameTile tile )
+        private List<BoardPosition> GetImmidiateNeighbours( BoardPosition position )
         {
-            var neighbours = new List<GameTile>();
+            var neighbours = new List<BoardPosition>();
 
-            int positionX = tile.BoardPosition.Column;
-            int positionY = tile.BoardPosition.Row;
+            int column = position.Column;
+            int row = position.Row;
             int maxColumnIndex = BoardDimensions.Column - 1;
             int maxRowIndex = BoardDimensions.Row - 1;
 
-            if ( positionY < maxRowIndex )
-                if ( tiles[positionX, positionY + 1] != null )
-                    neighbours.Add( tiles[positionX, positionY + 1] );
-            if ( positionY > 0 )
-                if ( tiles[positionX, positionY - 1] != null )
-                    neighbours.Add( tiles[positionX, positionY - 1] );
-            if ( positionX < maxColumnIndex )
-                if ( tiles[positionX + 1, positionY] != null )
-                    neighbours.Add( tiles[positionX + 1, positionY] );
-            if ( positionX > 0 )
-                if ( tiles[positionX - 1, positionY] != null )
-                    neighbours.Add( tiles[positionX - 1, positionY] );
+            if ( row < maxRowIndex )
+                if ( tiles[column, row + 1] != null )
+                    neighbours.Add( new BoardPosition( column, row + 1 ) );
+            if ( row > 0 )
+                if ( tiles[column, row - 1] != null )
+                    neighbours.Add( new BoardPosition( column, row - 1 ) );
+            if ( column < maxColumnIndex )
+                if ( tiles[column + 1, row] != null )
+                    neighbours.Add( new BoardPosition( column + 1, row ) );
+            if ( column > 0 )
+                if ( tiles[column - 1, row] != null )
+                    neighbours.Add( new BoardPosition( column - 1, row ) );
 
             return neighbours;
+        }
+
+        BoardPosition FindPosition( GameTile tile )
+        {
+            // TODO: Could be implemented way more efficiently, such as:
+            // could track positions for tiles in a dict (or something similar) OR
+            // tiles could know their position
+            // ATM an optimization is not needed.
+
+            for ( int column = 0; column < BoardDimensions.Column; column++ )
+            {
+                for ( int row = BoardDimensions.Row - 1; row >= 0; row-- ) // Start from the bottom so we don't overwrite existing blocks
+                {
+                    if ( tiles[column, row] == tile )
+                    {
+                        return new BoardPosition( column, row );
+                    }
+                }
+            }
+
+            throw new InvalidOperationException( "The requested tile is not on the board!" );
         }
     }
 }
