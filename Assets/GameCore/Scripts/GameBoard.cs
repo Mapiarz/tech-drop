@@ -84,7 +84,7 @@ namespace TechDrop.Gameplay
 
             var sameColorNeighbours = FindNeighbours( tile, new List<GameTile>() );
 
-            // Destroy the tiles
+            // Update the board by nullifying the tiles to be removed and shifting tiles down
             if ( sameColorNeighbours.Count >= neighbourThreshold )
             {
                 foreach ( var item in sameColorNeighbours )
@@ -111,7 +111,7 @@ namespace TechDrop.Gameplay
                     }
                 }
 
-                // Destroy the tiles
+                // Destroy tile game objects
                 foreach ( var item in sameColorNeighbours )
                     DestroyTile( item );
 

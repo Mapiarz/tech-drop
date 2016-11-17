@@ -53,6 +53,7 @@ namespace TechDrop.Gameplay
 
         public void MoveTo( BoardPosition destination )
         {
+            // TODO: Assert isMoving == false?
             if ( isMoving )
                 return;
 
@@ -63,9 +64,11 @@ namespace TechDrop.Gameplay
             if ( delta.magnitude > 0.01f ) // Could be 0 but we want to avoid float precision errors
             {
                 var rotations = destination.Row - BoardPosition.Row;
-                BoardPosition = destination;
                 desiredPosition = targetLocalPosition;
                 desiredRotation = transform.rotation * Quaternion.Euler( 0, 0, -90 * rotations ); // Rotate by 90 degress clockwise
+
+                BoardPosition = destination;
+
                 isMoving = true;
             }
         }
