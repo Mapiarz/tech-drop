@@ -10,16 +10,11 @@ namespace TechDrop.Gameplay
     [Serializable]
     public class GameBoard : MonoBehaviour
     {
-        [SerializeField]
-        BoardPosition boardDimensions;
-        [SerializeField]
-        Rect gameBoardArea;
-        [SerializeField]
-        float blockSpeed = 1f;
-        [SerializeField]
-        int neighbourThreshold = 3;
-        [SerializeField]
-        List<TileSprite> tileColors = new List<TileSprite>();
+        [SerializeField] BoardPosition boardDimensions;
+        [SerializeField] Rect gameBoardArea;
+        [SerializeField] float blockSpeed = 1f;
+        [SerializeField] int neighbourThreshold = 3;
+        [SerializeField] List<TileSprite> tileColors = new List<TileSprite>();
 
         GameTile[,] tiles;
         bool isLocked = false;
