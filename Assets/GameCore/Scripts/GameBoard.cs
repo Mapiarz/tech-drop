@@ -10,16 +10,11 @@ namespace TechDrop.Gameplay
     [Serializable]
     public class GameBoard : MonoBehaviour
     {
-        [SerializeField]
-        BoardPosition boardDimensions;
-        [SerializeField]
-        Rect gameBoardArea;
-        [SerializeField]
-        float blockSpeed = 1f;
-        [SerializeField]
-        int neighbourThreshold = 3;
-        [SerializeField]
-        List<TileSprite> tileColors = new List<TileSprite>();
+        [SerializeField] BoardPosition boardDimensions;
+        [SerializeField] Rect gameBoardArea;
+        [SerializeField] float blockSpeed = 1f;
+        [SerializeField] int neighbourThreshold = 3;
+        [SerializeField] List<TileSprite> tileColors = new List<TileSprite>();
 
         GameTile[,] tiles;
         bool isLocked = false;
@@ -32,11 +27,6 @@ namespace TechDrop.Gameplay
             {
                 return boardDimensions;
             }
-
-            set
-            {
-                boardDimensions = value;
-            }
         }
 
         public float BlockSpeed
@@ -45,14 +35,10 @@ namespace TechDrop.Gameplay
             {
                 return blockSpeed;
             }
-
-            set
-            {
-                blockSpeed = value;
-            }
         }
 
-        public float BlockSize
+        // Vertical space occupied by a single tile
+        public float VerticalBlockSize
         {
             get
             {
@@ -66,11 +52,6 @@ namespace TechDrop.Gameplay
             {
                 return gameBoardArea;
             }
-
-            set
-            {
-                gameBoardArea = value;
-            }
         }
 
         void Awake()
@@ -78,8 +59,8 @@ namespace TechDrop.Gameplay
             Assert.IsTrue( BlockSpeed > 0f );
             Assert.IsTrue( tileColors.Count > 0 );
 
+            // Initialize the tiles
             tiles = new GameTile[BoardDimensions.Column, BoardDimensions.Row];
-
             for ( int i = 0; i < BoardDimensions.Column; i++ )
             {
                 for ( int j = 0; j < BoardDimensions.Row; j++ )
@@ -95,17 +76,18 @@ namespace TechDrop.Gameplay
             if ( isLocked )
                 return;
 
-            var sameColorNeighbours = FindNeighbours( FindPosition(tile), new List<BoardPosition>() );
+            var sameColorNeighbours = FindNeighbours( FindPosition( tile ), new List<BoardPosition>() );
 
-            // Update the board by nullifying the tiles to be removed and shifting tiles down
             if ( sameColorNeighbours.Count >= neighbourThreshold )
             {
+                // Destroy and nullify tiles that user clicked
                 foreach ( var item in sameColorNeighbours )
                 {
                     DestroyTile( tiles[item.Column, item.Row] );
                     tiles[item.Column, item.Row] = null;
                 }
 
+                // Update the game board by shifting tiles down the screen
                 for ( int column = 0; column < BoardDimensions.Column; column++ )
                 {
                     for ( int row = BoardDimensions.Row - 1; row >= 0; row-- ) // Start from the bottom so we don't overwrite existing blocks
@@ -126,11 +108,7 @@ namespace TechDrop.Gameplay
                     }
                 }
 
-                // Destroy tile game objects
-                //foreach ( var item in sameColorNeighbours )
-                //    DestroyTile( tiles[item.Column, item.Row] );
-
-                // Iteratre over columns and spawn new tiles
+                // Iteratre over columns and spawn new tiles in the empty spots
                 for ( int i = 0; i < BoardDimensions.Column; i++ )
                 {
                     int nullCount = 0;
@@ -145,7 +123,7 @@ namespace TechDrop.Gameplay
                         var newTile = SpawnTile( new BoardPosition( i, -( j + 1 ) ) );
                         var destinationRow = nullCount - 1 - j;
                         var localPosition = BoardPositionToLocalPosition( new BoardPosition( i, destinationRow ) );
-                        newTile.MoveTo( localPosition, destinationRow + j + 1);
+                        newTile.MoveTo( localPosition, destinationRow + j + 1 );
                         tiles[i, destinationRow] = newTile;
                         blocksMoving++;
                     }
@@ -206,18 +184,13 @@ namespace TechDrop.Gameplay
 
         private Vector3 BoardPositionToLocalPosition( BoardPosition pos )
         {
-            //var size = rendererComponent.bounds.size;
-            var width = GameBoardArea.width / (float)BoardDimensions.Column;
-            var height = GameBoardArea.height / (float)BoardDimensions.Row;
-            //float columnPadding = ( gameBoard.GameBoardArea.width - ( gameBoard.BoardDimensions.Column * size.x ) ) / ( gameBoard.BoardDimensions.Column + 1 );
-            //float rowPadding = ( gameBoard.GameBoardArea.height - ( gameBoard.BoardDimensions.Row * size.x ) ) / ( gameBoard.BoardDimensions.Row + 1 );
-            //Vector3 padding = new Vector3( columnPadding * ( pos.Column + 1 ), rowPadding * ( pos.Row + 1 ) * -1 );
-            Vector3 boardTopLeftAnchor = new Vector3( GameBoardArea.position.x, GameBoardArea.position.y ) - transform.localPosition;
-            //Vector3 boardPosition = new Vector3( pos.Column * size.x, pos.Row * size.y * -1 );
-            Vector3 tileSizeOffset = new Vector3( width / 2, -1 * height / 2 );
-            //Vector3 localPosition = boardTopLeftAnchor + boardPosition + padding + tileSizeOffset;
+            var blockWidth = GameBoardArea.width / (float)BoardDimensions.Column;
+            var blockHeight = GameBoardArea.height / (float)BoardDimensions.Row;
+            var boardTopLeftAnchor = new Vector3( GameBoardArea.position.x, GameBoardArea.position.y ) - transform.localPosition;
+            var tileSizeOffset = new Vector3( blockWidth / 2, -1 * blockHeight / 2 );
+            var blockPosition = new Vector3( pos.Column * blockWidth, pos.Row * blockHeight * -1 );
 
-            var localPosition = new Vector3( pos.Column * width, pos.Row * height * -1 ) + boardTopLeftAnchor + tileSizeOffset;
+            var localPosition = blockPosition + boardTopLeftAnchor + tileSizeOffset;
 
             return localPosition;
         }
