@@ -10,18 +10,13 @@ namespace TechDrop.Gameplay
         [SerializeField] BoolMatrix effectArray;
         [SerializeField] GameBoard gameBoard;
 
-        bool isInitialized;
         float timeToCoolDown;
 
         bool IsCoolingDown { get { return timeToCoolDown > 0f; } }
 
-        public void Initialize( GameBoard gameBoard )
+        void Awake()
         {
             Assert.IsNotNull( gameBoard );
-
-            this.gameBoard = gameBoard;
-
-            isInitialized = true;
         }
 
         public void Fire()
