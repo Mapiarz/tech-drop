@@ -36,6 +36,18 @@ namespace TechDrop.Gameplay
             }
         }
 
+        public void Initialize( GameBoard game )
+        {
+            gameBoard = game;
+            Assert.IsNotNull( gameBoard );
+        }
+
+        void Awake()
+        {
+            rendererComponent = transform.GetComponent<SpriteRenderer>();
+            Assert.IsNotNull( rendererComponent );
+        }
+
         public void MoveTo( Vector3 localPosition, int rotations )
         {
             Assert.IsFalse( isMoving );
@@ -57,25 +69,11 @@ namespace TechDrop.Gameplay
             transform.localPosition = destination;
         }
 
-        public void Initialize( GameBoard game )
-        {
-            gameBoard = game;
-            Assert.IsNotNull( gameBoard );
-        }
-
-        void Awake()
-        {
-            rendererComponent = transform.GetComponent<SpriteRenderer>();
-            Assert.IsNotNull( rendererComponent );
-        }
-
         void Update()
         {
             // TODO: Move this to a coroutine
             if ( isMoving )
             {
-                var delta = desiredPosition - transform.localPosition;
-
                 var timePerBlock = gameBoard.VerticalBlockSize / gameBoard.BlockSpeed;  // Time it takes to move by one block
                 var degreesPerSecond = 90 / timePerBlock;  // Degrees a second, we need to rotate 90 per each block
 

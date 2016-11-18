@@ -52,6 +52,10 @@ namespace TechDrop.Gameplay
             {
                 return gameBoardArea;
             }
+            set
+            {
+                gameBoardArea = value;
+            }
         }
 
         void Awake()
