@@ -97,6 +97,7 @@ namespace TechDrop.Gameplay
 
             Assert.IsTrue( effectMatrix.Size <= BoardDimensions.Row );
             Assert.IsTrue( effectMatrix.Size <= BoardDimensions.Column );
+            // TODO: Add logic when effect matrix size is smaller than the board
 
             var tilesToDestroy = new List<BoardPosition>();
 

@@ -12,7 +12,8 @@ namespace TechDrop.Gameplay
 
         float timeToCoolDown;
 
-        bool IsCoolingDown { get { return timeToCoolDown > 0f; } }
+        public bool IsCoolingDown { get { return timeToCoolDown > 0f; } }
+        public float TimeToCoolDown { get { return timeToCoolDown; } }
 
         void Awake()
         {
