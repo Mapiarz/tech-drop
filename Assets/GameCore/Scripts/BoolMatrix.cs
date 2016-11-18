@@ -4,8 +4,7 @@ using UnityEngine;
 [Serializable]
 public class BoolMatrix
 {
-    [SerializeField]
-    RowData[] row;
+    [SerializeField] RowData[] row;
 
     public RowData[] Row
     {
@@ -19,6 +18,8 @@ public class BoolMatrix
         }
     }
 
+    public int Size { get { return Row.Length; } }
+
     public BoolMatrix( int size )
     {
         Row = new RowData[size];
@@ -31,8 +32,7 @@ public class BoolMatrix
     [Serializable]
     public class RowData
     {
-        [SerializeField]
-        bool[] column;
+        [SerializeField] bool[] column;
 
         public RowData( int size )
         {

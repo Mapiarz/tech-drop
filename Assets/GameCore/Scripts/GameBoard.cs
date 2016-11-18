@@ -10,11 +10,16 @@ namespace TechDrop.Gameplay
     [Serializable]
     public class GameBoard : MonoBehaviour
     {
-        [SerializeField] BoardPosition boardDimensions;
-        [SerializeField] Rect gameBoardArea;
-        [SerializeField] float blockSpeed = 1f;
-        [SerializeField] int neighbourThreshold = 3;
-        [SerializeField] List<TileSprite> tileColors = new List<TileSprite>();
+        [SerializeField]
+        BoardPosition boardDimensions;
+        [SerializeField]
+        Rect gameBoardArea;
+        [SerializeField]
+        float blockSpeed = 1f;
+        [SerializeField]
+        int neighbourThreshold = 3;
+        [SerializeField]
+        List<TileSprite> tileColors = new List<TileSprite>();
 
         GameTile[,] tiles;
         bool isLocked = false;
@@ -84,58 +89,84 @@ namespace TechDrop.Gameplay
 
             if ( sameColorNeighbours.Count >= neighbourThreshold )
             {
-                // Destroy and nullify tiles that user clicked
-                foreach ( var item in sameColorNeighbours )
-                {
-                    DestroyTile( tiles[item.Column, item.Row] );
-                    tiles[item.Column, item.Row] = null;
-                }
+                DestroyTiles( sameColorNeighbours );
+            }
+        }
 
-                // Update the game board by shifting tiles down the screen
-                for ( int column = 0; column < BoardDimensions.Column; column++ )
+        public void FireGun( BoolMatrix effectMatrix )
+        {
+            Assert.IsTrue( effectMatrix.Size <= BoardDimensions.Row );
+            Assert.IsTrue( effectMatrix.Size <= BoardDimensions.Column );
+
+            var tilesToDestroy = new List<BoardPosition>();
+
+            for ( int row = 0; row < effectMatrix.Size; row++ )
+            {
+                for ( int column = 0; column < effectMatrix.Size; column++ )
                 {
-                    for ( int row = BoardDimensions.Row - 1; row >= 0; row-- ) // Start from the bottom so we don't overwrite existing blocks
+                    if ( effectMatrix.Row[row].Column[column] )
                     {
-                        var tileToShift = tiles[column, row];
-                        if ( tileToShift != null )
+                        tilesToDestroy.Add( new BoardPosition( column, row ) );
+                    }
+                }
+            }
+
+            DestroyTiles( tilesToDestroy );
+        }
+
+        void DestroyTiles( IList<BoardPosition> tilesToDestroy )
+        {
+            // Destroy and nullify the tiles
+            foreach ( var item in tilesToDestroy )
+            {
+                DespawnTile( tiles[item.Column, item.Row] );
+                tiles[item.Column, item.Row] = null;
+            }
+
+            // Update the game board by shifting tiles down the screen
+            for ( int column = 0; column < BoardDimensions.Column; column++ )
+            {
+                for ( int row = BoardDimensions.Row - 1; row >= 0; row-- ) // Start from the bottom so we don't overwrite existing blocks
+                {
+                    var tileToShift = tiles[column, row];
+                    if ( tileToShift != null )
+                    {
+                        var shiftBy = BlocksDestroyedBelow( column, row );
+                        if ( shiftBy > 0 )
                         {
-                            var shiftBy = BlocksDestroyedBelow( column, row );
-                            if ( shiftBy > 0 )
-                            {
-                                tiles[column, row] = null;
-                                tiles[column, row + shiftBy] = tileToShift;
-                                var localPosition = BoardPositionToLocalPosition( new BoardPosition( column, row + shiftBy ) );
-                                tileToShift.MoveTo( localPosition, shiftBy );
-                                blocksMoving++; // Increase the number of blocks that is changing position
-                            }
+                            tiles[column, row] = null;
+                            tiles[column, row + shiftBy] = tileToShift;
+                            var localPosition = BoardPositionToLocalPosition( new BoardPosition( column, row + shiftBy ) );
+                            tileToShift.MoveTo( localPosition, shiftBy );
+                            blocksMoving++; // Increase the number of blocks that is changing position
                         }
                     }
                 }
+            }
 
-                // Iteratre over columns and spawn new tiles in the empty spots
-                for ( int i = 0; i < BoardDimensions.Column; i++ )
+            // Iteratre over columns and spawn new tiles in the empty spots
+            for ( int i = 0; i < BoardDimensions.Column; i++ )
+            {
+                int nullCount = 0;
+                for ( int j = 0; j < BoardDimensions.Row; j++ )
                 {
-                    int nullCount = 0;
-                    for ( int j = 0; j < BoardDimensions.Row; j++ )
-                    {
-                        if ( tiles[i, j] == null )
-                            nullCount++;
-                    }
-
-                    for ( int j = 0; j < nullCount; j++ )
-                    {
-                        var newTile = SpawnTile( new BoardPosition( i, -( j + 1 ) ) );
-                        var destinationRow = nullCount - 1 - j;
-                        var localPosition = BoardPositionToLocalPosition( new BoardPosition( i, destinationRow ) );
-                        newTile.MoveTo( localPosition, destinationRow + j + 1 );
-                        tiles[i, destinationRow] = newTile;
-                        blocksMoving++;
-                    }
+                    if ( tiles[i, j] == null )
+                        nullCount++;
                 }
 
-                // Shall we lock the board?
-                isLocked = blocksMoving > 0;
+                for ( int j = 0; j < nullCount; j++ )
+                {
+                    var newTile = SpawnTile( new BoardPosition( i, -( j + 1 ) ) );
+                    var destinationRow = nullCount - 1 - j;
+                    var localPosition = BoardPositionToLocalPosition( new BoardPosition( i, destinationRow ) );
+                    newTile.MoveTo( localPosition, destinationRow + j + 1 );
+                    tiles[i, destinationRow] = newTile;
+                    blocksMoving++;
+                }
             }
+
+            // Shall we lock the board?
+            isLocked = blocksMoving > 0;
         }
 
         private GameTile SpawnTile( BoardPosition targetPosition )
@@ -156,7 +187,7 @@ namespace TechDrop.Gameplay
             return tileComponent;
         }
 
-        private void DestroyTile( GameTile tile )
+        private void DespawnTile( GameTile tile )
         {
             // Unregister the events
             tile.TileClicked -= GameBoard_TileClicked;
