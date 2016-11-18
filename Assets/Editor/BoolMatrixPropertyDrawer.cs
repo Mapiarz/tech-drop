@@ -33,8 +33,8 @@ public class BoolMatrixPropertyDrawer : PropertyDrawer
             var margin = newposition.width / 2f - CheckBoxSize / 2f;  // so the checkbox matrix is centered
             newposition.x += margin;
 
-            // Assign number of columns - not sure what this was for. Maybe something to do with changing the matrix size?
-            // columns.arraySize = rows.arraySize;
+            // The following line allows setting the matrix size from editor
+            columns.arraySize = rows.arraySize;
 
             for ( int column = 0; column < rows.arraySize; column++ )
             {
