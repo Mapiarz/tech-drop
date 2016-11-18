@@ -8,9 +8,12 @@ namespace TechDrop.Gameplay
     {
         [SerializeField] float coolDown;
         [SerializeField] BoolMatrix effectArray;
-
         [SerializeField] GameBoard gameBoard;
+
         bool isInitialized;
+        float timeToCoolDown;
+
+        bool IsCoolingDown { get { return timeToCoolDown > 0f; } }
 
         public void Initialize( GameBoard gameBoard )
         {
@@ -23,13 +26,26 @@ namespace TechDrop.Gameplay
 
         public void Fire()
         {
-            //Assert.IsTrue( isInitialized );
-            // TODO: Check cooldown
-            // If cooldown, return false?
-            // If fire successful, reset cooldown
+            // TODO: This method could possibly return bool
+
+            if ( IsCoolingDown )
+            {
+                return;
+            }
 
             var fireSuccessful = gameBoard.FireGun( effectArray );
+            timeToCoolDown = coolDown;
             Debug.Log( string.Format( "Fire successful {0}", fireSuccessful ) );
+        }
+
+        void Update()
+        {
+            // TODO: Move to coroutine?
+            // Cool the gun down
+            if ( IsCoolingDown )
+            {
+                timeToCoolDown -= Time.deltaTime;
+            }
         }
 
         void OnGUI()
