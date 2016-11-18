@@ -1,13 +1,20 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.Assertions;
+using UnityEngine.EventSystems;
+using System;
 
 namespace TechDrop.Gameplay
 {
-    public class GameGunUI : MonoBehaviour
+    public class GameGunUI : MonoBehaviour, IPointerDownHandler
     {
         [SerializeField] GameGun gameGun;
         [SerializeField] TextMesh timer;
+
+        public void OnPointerDown( PointerEventData eventData )
+        {
+            gameGun.Fire();
+        }
 
         void Awake()
         {

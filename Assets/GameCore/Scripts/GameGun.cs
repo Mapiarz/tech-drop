@@ -30,7 +30,10 @@ namespace TechDrop.Gameplay
             }
 
             var fireSuccessful = gameBoard.FireGun( effectArray );
-            timeToCoolDown = coolDown;
+            if ( fireSuccessful )
+            {
+                timeToCoolDown = coolDown;
+            }
             Debug.Log( string.Format( "Fire successful {0}", fireSuccessful ) );
         }
 
@@ -44,12 +47,12 @@ namespace TechDrop.Gameplay
             }
         }
 
-        void OnGUI()
-        {
-            if ( GUI.Button( new Rect( 100, 100, 100, 100 ), "Fire" ) )
-            {
-                Fire();
-            }
-        }
+        //void OnGUI()
+        //{
+        //    if ( GUI.Button( new Rect( 100, 100, 100, 100 ), "Fire" ) )
+        //    {
+        //        Fire();
+        //    }
+        //}
     }
 }
