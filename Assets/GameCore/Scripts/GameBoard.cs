@@ -88,8 +88,13 @@ namespace TechDrop.Gameplay
             }
         }
 
-        public void FireGun( BoolMatrix effectMatrix )
+        public bool FireGun( BoolMatrix effectMatrix )
         {
+            if ( isLocked )  // If board is locked, cannot use gun
+            {
+                return false;
+            }
+
             Assert.IsTrue( effectMatrix.Size <= BoardDimensions.Row );
             Assert.IsTrue( effectMatrix.Size <= BoardDimensions.Column );
 
@@ -107,6 +112,8 @@ namespace TechDrop.Gameplay
             }
 
             DestroyTiles( tilesToDestroy );
+
+            return true;
         }
 
         void DestroyTiles( IList<BoardPosition> tilesToDestroy )

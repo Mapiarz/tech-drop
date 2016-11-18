@@ -25,8 +25,11 @@ namespace TechDrop.Gameplay
         {
             //Assert.IsTrue( isInitialized );
             // TODO: Check cooldown
-            gameBoard.FireGun( effectArray );
-            Debug.Break();
+            // If cooldown, return false?
+            // If fire successful, reset cooldown
+
+            var fireSuccessful = gameBoard.FireGun( effectArray );
+            Debug.Log( string.Format( "Fire successful {0}", fireSuccessful ) );
         }
 
         void OnGUI()
