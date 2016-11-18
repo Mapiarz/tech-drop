@@ -12,9 +12,6 @@ namespace TechDrop.Gameplay
     {
         [SerializeField] TileColor color;
 
-        // Variables used to move and rotate tiles
-        Vector3 desiredPosition;
-        Quaternion desiredRotation;
         bool isMoving = false;
 
         GameBoard gameBoard;
@@ -48,16 +45,6 @@ namespace TechDrop.Gameplay
             Assert.IsNotNull( rendererComponent );
         }
 
-        public void MoveTo( Vector3 localPosition, int rotations )
-        {
-            Assert.IsFalse( isMoving );
-
-            desiredPosition = localPosition;
-            desiredRotation = transform.rotation * Quaternion.Euler( 0, 0, -90 * rotations ); // Rotate by 90 degress clockwise
-
-            isMoving = true;
-        }
-
         public void SetColor( TileColor newColor, Sprite newSprite )
         {
             Color = newColor;
@@ -69,26 +56,35 @@ namespace TechDrop.Gameplay
             transform.localPosition = destination;
         }
 
-        void Update()
+        public void MoveTo( Vector3 localPosition, int rotations )
         {
-            // TODO: Move this to a coroutine
-            if ( isMoving )
-            {
-                var timePerBlock = gameBoard.VerticalBlockSize / gameBoard.BlockSpeed;  // Time it takes to move by one block
-                var degreesPerSecond = 90 / timePerBlock;  // Degrees a second, we need to rotate 90 per each block
+            Assert.IsFalse( isMoving );
 
+            // Rotate by 90 degress clockwise
+            var targetRotation = transform.rotation * Quaternion.Euler( 0, 0, -90 * rotations );
+
+            StartCoroutine( Move( localPosition, targetRotation ) );
+        }
+
+        IEnumerator Move( Vector3 targetPosition, Quaternion targetRotation )
+        {
+            isMoving = true;
+            var timePerBlock = gameBoard.VerticalBlockSize / gameBoard.BlockSpeed;  // Time it takes to move by one block
+            var degreesPerSecond = 90 / timePerBlock;  // Degrees a second, we need to rotate 90 per each block
+
+            do
+            {
+                yield return null;
                 transform.Translate( new Vector3( 0, Time.deltaTime * -gameBoard.BlockSpeed, 0 ), Space.World );
                 transform.Rotate( Vector3.forward, Time.deltaTime * -degreesPerSecond, Space.World );
 
-                if ( transform.localPosition.y <= desiredPosition.y )
-                {
-                    transform.localPosition = desiredPosition;
-                    transform.rotation = desiredRotation;
-                    isMoving = false;
-                    if ( MovingFinished != null )
-                        MovingFinished( this );
-                }
-            }
+            } while ( transform.localPosition.y > targetPosition.y );
+
+            transform.localPosition = targetPosition;
+            transform.rotation = targetRotation;
+            isMoving = false;
+            if ( MovingFinished != null )
+                MovingFinished( this );
         }
 
         public void OnPointerClick( PointerEventData eventData )
