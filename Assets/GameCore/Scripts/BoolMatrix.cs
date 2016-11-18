@@ -39,7 +39,7 @@ public class BoolMatrix
             Column = new bool[size];
         }
 
-        public bool[] Column  // Column, so it can be accessed like Rows[0].Column[1];
+        public bool[] Column  // Column, so it can be accessed like Row[0].Column[1];
         {
             get
             {
