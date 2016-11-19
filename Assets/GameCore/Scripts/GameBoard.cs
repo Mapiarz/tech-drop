@@ -10,6 +10,7 @@ namespace TechDrop.Gameplay
     [Serializable]
     public class GameBoard : MonoBehaviour
     {
+        // TODO: Add gameEnabled assertions so that you cannot destroy blocks and stuff while game is disabled
         [SerializeField] bool gameEnabled;
         [SerializeField] BoardPosition boardDimensions;
         [SerializeField] Rect gameBoardArea;
