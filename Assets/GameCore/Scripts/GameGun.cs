@@ -6,9 +6,9 @@ namespace TechDrop.Gameplay
 {
     public class GameGun : MonoBehaviour
     {
-        [SerializeField] float coolDown;
-        [SerializeField] BoolMatrix effectArray;
+        [SerializeField] float coolDownDuration;
         [SerializeField] GameBoard gameBoard;
+        [SerializeField] BoolMatrix gunEffect;
 
         float timeToCoolDown;
 
@@ -22,37 +22,32 @@ namespace TechDrop.Gameplay
 
         public void Fire()
         {
-            // TODO: This method could possibly return bool
+            // This method could possibly return bool
 
             if ( IsCoolingDown )
             {
                 return;
             }
 
-            var fireSuccessful = gameBoard.FireGun( effectArray );
+            var fireSuccessful = gameBoard.FireGun( gunEffect );
             if ( fireSuccessful )
             {
-                timeToCoolDown = coolDown;
+                timeToCoolDown = coolDownDuration;
             }
-            Debug.Log( string.Format( "Fire successful {0}", fireSuccessful ) );
         }
 
         void Update()
         {
-            // TODO: Move to coroutine?
             // Cool the gun down
             if ( IsCoolingDown )
             {
                 timeToCoolDown -= Time.deltaTime;
+
+                if ( timeToCoolDown < 0f )  // For clarity, set the time to cool down to 0
+                {
+                    timeToCoolDown = 0f;
+                }
             }
         }
-
-        //void OnGUI()
-        //{
-        //    if ( GUI.Button( new Rect( 100, 100, 100, 100 ), "Fire" ) )
-        //    {
-        //        Fire();
-        //    }
-        //}
     }
 }

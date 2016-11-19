@@ -9,31 +9,26 @@ namespace TechDrop.Gameplay
     public class GameGunUI : MonoBehaviour, IPointerDownHandler
     {
         [SerializeField] GameGun gameGun;
-        [SerializeField] TextMesh timer;
-
-        public void OnPointerDown( PointerEventData eventData )
-        {
-            gameGun.Fire();
-        }
+        [SerializeField] TextMesh timerMesh;
 
         void Awake()
         {
             Assert.IsNotNull( gameGun );
-            Assert.IsNotNull( timer );
+            Assert.IsNotNull( timerMesh );
         }
 
-        // TODO: Move this to a coroutine
         void Update()
         {
+            // Potentially can be moved to a coroutine
             if ( gameGun.IsCoolingDown )
             {
-                var time = gameGun.TimeToCoolDown.ToString( "00" );
-                timer.text = time;
+                timerMesh.text = gameGun.TimeToCoolDown.ToString( "00" );
             }
-            else
-            {
-                timer.text = "00";
-            }
+        }
+
+        public void OnPointerDown( PointerEventData eventData )
+        {
+            gameGun.Fire();
         }
     }
 }

@@ -96,7 +96,7 @@ namespace TechDrop.Gameplay
                 return false;
             }
 
-            // TODO: Potentially, could add logic to support different sizes of game gun effect matrices but at this
+            // Potentially, could add logic to support different sizes of game gun effect matrices but at this
             // point it is simply not worth it.
             Assert.AreEqual( effectMatrix.Size, BoardDimensions.Row );
             Assert.AreEqual( effectMatrix.Size, BoardDimensions.Column );
