@@ -88,6 +88,7 @@ namespace TechDrop.Gameplay
             }
         }
 
+        // Returns true if effect succeeded
         public bool FireGun( BoolMatrix effectMatrix )
         {
             if ( isLocked )  // If board is locked, cannot use gun
@@ -95,9 +96,10 @@ namespace TechDrop.Gameplay
                 return false;
             }
 
-            Assert.IsTrue( effectMatrix.Size <= BoardDimensions.Row );
-            Assert.IsTrue( effectMatrix.Size <= BoardDimensions.Column );
-            // TODO: Add logic when effect matrix size is smaller than the board
+            // TODO: Potentially, could add logic to support different sizes of game gun effect matrices but at this
+            // point it is simply not worth it.
+            Assert.AreEqual( effectMatrix.Size, BoardDimensions.Row );
+            Assert.AreEqual( effectMatrix.Size, BoardDimensions.Column );
 
             var tilesToDestroy = new List<BoardPosition>();
 
