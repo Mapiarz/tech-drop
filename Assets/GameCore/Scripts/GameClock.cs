@@ -28,9 +28,10 @@ namespace TechDrop.Gameplay
             {
                 TimeRemaining -= Time.deltaTime;
 
-                if ( TimeRemaining < 0f )  // For clarity, set the remaining time to 0
+                if ( TimeRemaining < 0f )  // For clarity, set the remaining time to 0 and disable game
                 {
                     TimeRemaining = 0f;
+                    gameBoard.GameEnabled = false;
                 }
             }
         }
@@ -39,6 +40,7 @@ namespace TechDrop.Gameplay
         {
             Assert.IsFalse( gameStarted );
 
+            gameBoard.GameEnabled = true;
             gameStarted = true;
         }
 

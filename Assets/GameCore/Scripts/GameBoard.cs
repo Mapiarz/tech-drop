@@ -10,6 +10,7 @@ namespace TechDrop.Gameplay
     [Serializable]
     public class GameBoard : MonoBehaviour
     {
+        [SerializeField] bool gameEnabled;
         [SerializeField] BoardPosition boardDimensions;
         [SerializeField] Rect gameBoardArea;
         [SerializeField] float blockSpeed = 1f;
@@ -21,30 +22,14 @@ namespace TechDrop.Gameplay
         int blocksMoving = 0;
         System.Random random = new System.Random();
 
-        public BoardPosition BoardDimensions
-        {
-            get
-            {
-                return boardDimensions;
-            }
-        }
+        public bool GameEnabled { get { return gameEnabled; } set { gameEnabled = value; } }
 
-        public float BlockSpeed
-        {
-            get
-            {
-                return blockSpeed;
-            }
-        }
+        public BoardPosition BoardDimensions { get { return boardDimensions; } }
+
+        public float BlockSpeed { get { return blockSpeed; } }
 
         // Vertical space occupied by a single tile
-        public float VerticalBlockSize
-        {
-            get
-            {
-                return GameBoardArea.height / (float)BoardDimensions.Row;
-            }
-        }
+        public float VerticalBlockSize { get { return GameBoardArea.height / (float)BoardDimensions.Row; } }
 
         public Rect GameBoardArea
         {
@@ -77,7 +62,8 @@ namespace TechDrop.Gameplay
         private void GameBoard_TileClicked( GameTile tile )
         {
             // If there are blocks moving and the board is locked, do nothing
-            if ( isLocked )
+            // Also do nothing if game is disabled
+            if ( isLocked || !GameEnabled )
                 return;
 
             var sameColorNeighbours = FindNeighbours( FindPosition( tile ), new List<BoardPosition>() );
@@ -91,7 +77,7 @@ namespace TechDrop.Gameplay
         // Returns true if effect succeeded
         public bool FireGun( BoolMatrix effectMatrix )
         {
-            if ( isLocked )  // If board is locked, cannot use gun
+            if ( isLocked || !GameEnabled )  // If board is locked or game disabled, cannot use gun
             {
                 return false;
             }
