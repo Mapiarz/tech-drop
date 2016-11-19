@@ -17,18 +17,32 @@ namespace TechDrop.Gameplay
             Assert.IsNotNull( timerMesh );
         }
 
-        void Update()
+        public void OnPointerDown( PointerEventData eventData )
         {
-            // Potentially can be moved to a coroutine
-            if ( gameGun.IsCoolingDown )
+            var fireSuccessful = gameGun.Fire();
+            if ( fireSuccessful )
             {
-                timerMesh.text = gameGun.TimeToCoolDown.ToString( "00" );
+                StopAllCoroutines();
+                StartCoroutine( UpdateGunTimer() );
             }
         }
 
-        public void OnPointerDown( PointerEventData eventData )
+        IEnumerator UpdateGunTimer()
         {
-            gameGun.Fire();
+            // a quarter second is enough to avoid going from 01 to 05 when user clicks repeatedly.
+            var updateCycle = 0.25f;
+
+            timerMesh.text = Mathf.CeilToInt( gameGun.TimeToCoolDown ).ToString( "00" );
+
+            yield return new WaitForSeconds( updateCycle );
+
+            while ( gameGun.IsCoolingDown )
+            {
+                timerMesh.text = Mathf.CeilToInt( gameGun.TimeToCoolDown ).ToString( "00" );
+                yield return new WaitForSeconds( updateCycle );
+            }
+
+            timerMesh.text = "00";
         }
     }
 }

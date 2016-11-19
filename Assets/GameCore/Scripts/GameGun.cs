@@ -20,13 +20,11 @@ namespace TechDrop.Gameplay
             Assert.IsNotNull( gameBoard );
         }
 
-        public void Fire()
+        public bool Fire()
         {
-            // This method could possibly return bool
-
             if ( IsCoolingDown )
             {
-                return;
+                return false;
             }
 
             var fireSuccessful = gameBoard.FireGun( gunEffect );
@@ -34,6 +32,8 @@ namespace TechDrop.Gameplay
             {
                 timeToCoolDown = coolDownDuration;
             }
+
+            return fireSuccessful;
         }
 
         void Update()
