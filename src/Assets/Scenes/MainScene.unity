@@ -191,6 +191,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gameBoard: {fileID: 1603047647}
   gameClock: {fileID: 1218361503}
+  gameScorer: {fileID: 1076775554}
 --- !u!4 &463621467
 Transform:
   m_ObjectHideFlags: 0
@@ -748,7 +749,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3f2e85b5dfdbe7a459eb0b011f405956, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameDuration: 5
+  gameDuration: 60
   gameBoard: {fileID: 1603047647}
 --- !u!114 &1218361504
 MonoBehaviour:
@@ -1188,8 +1189,8 @@ MonoBehaviour:
     y: 3.8
     width: 7.5
     height: 7.5
-  blockSpeed: 2.5
-  neighbourThreshold: 1
+  blockSpeed: 7
+  neighbourThreshold: 3
   tileColors:
   - color: 0
     sprite: {fileID: 21300000, guid: dc1d32cfda3a6b2408b849fbb0f55be4, type: 3}
