@@ -43,13 +43,5 @@ namespace TechDrop.Gameplay
             gameBoard.GameEnabled = true;
             gameStarted = true;
         }
-
-        void OnGUI()
-        {
-            if ( GUI.Button( new Rect( 100, 100, 100, 100 ), "START" ) )
-            {
-                StartGame();
-            }
-        }
     }
 }
