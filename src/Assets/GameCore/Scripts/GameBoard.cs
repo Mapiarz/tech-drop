@@ -43,6 +43,8 @@ namespace TechDrop.Gameplay
             }
         }
 
+        public event EventHandler<IEnumerable<BoardPosition>> TilesDestroyed;
+
         void Awake()
         {
             Assert.IsTrue( BlockSpeed > 0f );
@@ -125,6 +127,8 @@ namespace TechDrop.Gameplay
                 DespawnTile( tiles[item.Column, item.Row] );
                 tiles[item.Column, item.Row] = null;
             }
+
+            TilesDestroyed?.Invoke( this, tilesToDestroy );
 
             // Update the game board by shifting tiles down the screen
             for ( int column = 0; column < BoardDimensions.Column; column++ )

@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -9,7 +7,7 @@ namespace TechDrop.Gameplay
     {
         [SerializeField] GameBoard gameBoard;
         [SerializeField] GameClock gameClock;
-        // TODO: GameScorer;
+        [SerializeField] GameScorer gameScorer;
 
         public GameBoard Board { get => gameBoard; }
         public GameClock Clock { get => gameClock; }
@@ -18,6 +16,7 @@ namespace TechDrop.Gameplay
         {
             Assert.IsNotNull( gameBoard );
             Assert.IsNotNull( gameClock );
+            Assert.IsNotNull( gameScorer );
             gameClock.ClockFinished += GameClock_ClockFinished;
         }
 
@@ -47,6 +46,7 @@ namespace TechDrop.Gameplay
             }
 
             gameClock.ResetClock();
+            gameScorer.ResetScore();
         }
     }
 }
