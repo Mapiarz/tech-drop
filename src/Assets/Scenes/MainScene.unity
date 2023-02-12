@@ -157,7 +157,53 @@ Transform:
   - {fileID: 1218361502}
   - {fileID: 1670411096}
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &463621465
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 463621467}
+  - component: {fileID: 463621466}
+  m_Layer: 0
+  m_Name: Game Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &463621466
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 463621465}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b52fb1126d6822b4aa226345dcc8b38e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gameBoard: {fileID: 1603047647}
+  gameClock: {fileID: 1218361503}
+--- !u!4 &463621467
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 463621465}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.27123612, y: -0.64073014, z: 0.042381402}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &523436029 stripped
 Transform:
@@ -543,7 +589,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3f2e85b5dfdbe7a459eb0b011f405956, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameDuration: 40
+  gameDuration: 5
   gameBoard: {fileID: 1603047647}
 --- !u!114 &1218361504
 MonoBehaviour:
@@ -826,7 +872,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1547641286
 PrefabInstance:
@@ -959,7 +1005,7 @@ Transform:
   - {fileID: 1592416304}
   - {fileID: 1922374131}
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1603047647
 MonoBehaviour:
@@ -1110,6 +1156,7 @@ GameObject:
   - component: {fileID: 1670411096}
   - component: {fileID: 1670411098}
   - component: {fileID: 1670411097}
+  - component: {fileID: 1670411099}
   m_Layer: 0
   m_Name: Start button
   m_TagString: Untagged
@@ -1178,9 +1225,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1218361503}
-        m_TargetAssemblyTypeName: TechDrop.Gameplay.GameClock, Assembly-CSharp
-        m_MethodName: StartGame
+      - m_Target: {fileID: 1670411099}
+        m_TargetAssemblyTypeName: TechDrop.Gameplay.StartGameButton, Assembly-CSharp
+        m_MethodName: ButtonPressed
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1216,6 +1263,22 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 3.54, y: 1}
   m_EdgeRadius: 0
+--- !u!114 &1670411099
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1670411095}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ffefc890d91f4374daad1e16a8a931a8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gameStoppedText: start
+  gameRunningText: reset
+  textMesh: {fileID: 1667253777}
+  gameManager: {fileID: 463621466}
 --- !u!1 &1789809215
 GameObject:
   m_ObjectHideFlags: 0

@@ -22,7 +22,7 @@ namespace TechDrop.Gameplay
         int blocksMoving = 0;
         System.Random random = new System.Random();
 
-        public bool GameEnabled { get { return gameEnabled; } set { gameEnabled = value; } }
+        public bool GameEnabled { get { return gameEnabled; } private set { gameEnabled = value; } }
 
         public BoardPosition BoardDimensions { get { return boardDimensions; } }
 
@@ -72,6 +72,18 @@ namespace TechDrop.Gameplay
             {
                 DestroyTiles( sameColorNeighbours );
             }
+        }
+
+        public void StartGame()
+        {
+            Assert.IsFalse( GameEnabled );
+            GameEnabled = true;
+        }
+
+        public void StopGame()
+        {
+            Assert.IsTrue( gameEnabled );
+            GameEnabled = false;
         }
 
         // Returns true if effect succeeded

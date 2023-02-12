@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.Assertions;
+using System;
 
 namespace TechDrop.Gameplay
 {
@@ -10,7 +11,9 @@ namespace TechDrop.Gameplay
         [SerializeField] GameBoard gameBoard;
 
         public float TimeRemaining { get; private set; }
-        bool gameStarted;
+        public bool IsClockRunning { get; private set; }
+
+        public event EventHandler ClockFinished;
 
         void Awake()
         {
@@ -21,27 +24,37 @@ namespace TechDrop.Gameplay
             TimeRemaining = gameDuration;
         }
 
+        public void StartClock()
+        {
+            Assert.IsFalse( IsClockRunning );
+            IsClockRunning = true;
+        }
+
+        public void ResetClock()
+        {
+            TimeRemaining = gameDuration;
+        }
+
+        public void StopClock()
+        {
+            Assert.IsTrue( IsClockRunning );
+            IsClockRunning = false;
+        }
+
         void Update()
         {
             // For accuracy time gets updated on every frame
-            if ( gameStarted && TimeRemaining != 0f )
+            if ( IsClockRunning && TimeRemaining != 0f )
             {
                 TimeRemaining -= Time.deltaTime;
 
                 if ( TimeRemaining < 0f )  // For clarity, set the remaining time to 0 and disable game
                 {
                     TimeRemaining = 0f;
-                    gameBoard.GameEnabled = false;
+                    IsClockRunning = false;
+                    ClockFinished?.Invoke( this, new EventArgs() );
                 }
             }
-        }
-
-        public void StartGame()
-        {
-            Assert.IsFalse( gameStarted );
-
-            gameBoard.GameEnabled = true;
-            gameStarted = true;
         }
     }
 }
