@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -30,7 +29,8 @@ namespace TechDrop.Gameplay
 
         void GameBoard_TilesDestroyed( object sender, IEnumerable<BoardPosition> e )
         {
-            Score += e.ToList().Count;
+            var tilesCount = e.Count();
+            Score += (int)( ( tilesCount * 10 ) * ( 1 + 0.1f * tilesCount ) );
             ScoreUpdated?.Invoke( this, Score );
         }
     }
