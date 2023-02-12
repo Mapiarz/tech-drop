@@ -10,7 +10,6 @@ namespace TechDrop.Gameplay
     [Serializable]
     public class GameBoard : MonoBehaviour
     {
-        // TODO: Add gameEnabled assertions so that you cannot destroy blocks and stuff while game is disabled
         [SerializeField] bool gameEnabled;
         [SerializeField] BoardPosition boardDimensions;
         [SerializeField] Rect gameBoardArea;
@@ -268,7 +267,7 @@ namespace TechDrop.Gameplay
 
         BoardPosition FindPosition( GameTile tile )
         {
-            // TODO: Could be implemented way more efficiently, such as:
+            // Note: Could be implemented way more efficiently, such as:
             // could track positions for tiles in a dict (or something similar) OR
             // tiles could know their position
             // ATM an optimization is not needed.

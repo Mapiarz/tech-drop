@@ -29,7 +29,6 @@ namespace TechDrop.Gameplay
 
         IEnumerator UpdateGunTimer()
         {
-            // TODO: Update to work in a similar fashion as GameClockUI
             // a quarter second is enough to avoid going from 01 to 05 when user clicks repeatedly.
             var updateCycle = 0.25f;
 
