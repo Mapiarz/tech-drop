@@ -45,6 +45,7 @@ namespace TechDrop.Gameplay
                 gameClock.StopClock();
             }
 
+            gameBoard.ResetBoard();
             gameClock.ResetClock();
             gameScorer.ResetScore();
         }

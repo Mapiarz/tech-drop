@@ -50,15 +50,38 @@ namespace TechDrop.Gameplay
             Assert.IsTrue( BlockSpeed > 0f );
             Assert.IsTrue( tileColors.Count > 0 );
 
-            // Initialize the tiles
-            tiles = new GameTile[BoardDimensions.Column, BoardDimensions.Row];
+            InitializeBoard();
+        }
+
+        void InitializeBoard()
+        {
+            tiles = new GameTile[ BoardDimensions.Column, BoardDimensions.Row ];
             for ( int i = 0; i < BoardDimensions.Column; i++ )
             {
                 for ( int j = 0; j < BoardDimensions.Row; j++ )
                 {
-                    tiles[i, j] = SpawnTile( new BoardPosition( i, j ) );
+                    tiles[ i, j ] = SpawnTile( new BoardPosition( i, j ) );
                 }
             }
+        }
+
+        private void ClearBoard()
+        {
+            for ( int i = 0; i < BoardDimensions.Column; i++ )
+            {
+                for ( int j = 0; j < BoardDimensions.Row; j++ )
+                {
+                    DespawnTile( tiles[ i, j ] );
+                }
+            }
+            blocksMoving = 0;
+            isLocked = false;
+        }
+
+        public void ResetBoard()
+        {
+            ClearBoard();
+            InitializeBoard();
         }
 
         private void GameBoard_TileClicked( GameTile tile )
