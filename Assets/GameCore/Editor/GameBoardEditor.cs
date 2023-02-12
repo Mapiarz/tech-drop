@@ -53,7 +53,7 @@ namespace TechDrop.EditorComponents
 
         private void DrawRectHandle( Vector3 position, Vector3 direction, GameBoard gameBoard )
         {
-            Vector3 newPosition = Handles.Slider( position, direction, HandleUtility.GetHandleSize( Vector3.one ) * 0.03f, new Handles.DrawCapFunction( Handles.DotCap ), 0f );
+            Vector3 newPosition = Handles.Slider( position, direction, HandleUtility.GetHandleSize( Vector3.one ) * 0.03f, new Handles.CapFunction( Handles.DotHandleCap ), 0f );
             if ( GUI.changed )
             {
                 Undo.RecordObject( gameBoard, "Resize ViewBox" );
